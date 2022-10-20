@@ -3,7 +3,7 @@ import {KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, Vie
 import { auth } from '../Firebase'
 import {useNavigation} from "@react-navigation/native";
 
-const Login = () => {
+const Register = () => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
@@ -18,18 +18,18 @@ const Login = () => {
     return unsubscribe
   }, [])
 
-  const handleLogin = () => {
+  const handleSignUp = () => {
     auth
-      .signInWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(email, password)
       .then(userCredentials => {
         const user = userCredentials.user
-        console.log(`logged in with email ${user.email}`)
+        console.log(`new account created with ${user.email}`)
       })
       .catch(error => alert(error.message))
   }
 
-  const handleRegister = () => {
-    navigation.replace("Register")
+  const handleLogin = () => {
+    navigation.replace("Login")
   }
 
   return (
@@ -55,15 +55,15 @@ const Login = () => {
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={handleLogin}
-          style={styles.button}
+          onPress={handleSignUp}
+          style={[styles.button, styles.buttonOutline]}
         >
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.register}>
-        <Text onPress={handleRegister}>
-          New to Monthly Update? Tap here to create an account
+      <View style={styles.loginIn}>
+        <Text onPress={handleLogin}>
+          Already have an account? Login here
         </Text>
       </View>
     </KeyboardAvoidingView>
@@ -106,17 +106,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonOutline: {
-    backgroundColor: 'white',
+    backgroundColor: 'orange',
     marginTop: 10,
     borderColor: 'gray',
     borderWidth: 1,
   },
-  buttonOutlineText: {
-
-  },
-  register: {
+  loginIn: {
     marginTop: 25,
   }
 })
 
-export default Login
+export default Register
