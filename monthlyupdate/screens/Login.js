@@ -1,7 +1,8 @@
 import React from 'react'
-import {KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native'
+import {Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native'
 import { auth } from '../Firebase'
 import {useNavigation} from "@react-navigation/native";
+import LogoFull from "../assets/logoFull.png";
 
 const Login = () => {
   const [email, setEmail] = React.useState('')
@@ -37,6 +38,9 @@ const Login = () => {
       style={styles.container}
       behavior="padding"
     >
+      <View style={styles.logoWrapper}>
+        <Image source={LogoFull} />
+      </View>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="email"
@@ -62,8 +66,8 @@ const Login = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.register}>
-        <Text onPress={handleRegister}>
-          New to Monthly Update? Tap here to create an account
+        <Text style={styles.bottomText} onPress={handleRegister}>
+          New to Update? Tap here to sign up
         </Text>
       </View>
     </KeyboardAvoidingView>
@@ -74,7 +78,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#ACECC2',
+  },
+  logoWrapper: {
+    position: 'absolute',
+    top: '20%',
   },
   inputContainer: {
     width: '80%'
@@ -93,15 +102,17 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   button: {
+    justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
-    backgroundColor: 'orange',
+    backgroundColor: 'white',
     padding: 15,
     borderRadius: 10,
     borderColor: 'gray',
     borderWidth: 1,
   },
   buttonText: {
-    color: 'white',
+    color: 'black',
     fontWeight: '700',
     fontSize: 16,
   },
@@ -111,11 +122,12 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
   },
-  buttonOutlineText: {
-
-  },
   register: {
-    marginTop: 25,
+    marginTop: 50,
+  },
+  bottomText: {
+    fontWeight: '700',
+    fontSize: 14
   }
 })
 
