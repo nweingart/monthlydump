@@ -3,10 +3,13 @@ import {View, Text, StyleSheet, TouchableOpacity, TextInput, Image} from 'react-
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useNavigation} from "@react-navigation/native";
 import SmallLogo from '../../assets/logoSimple.png'
+import {useDispatch} from "react-redux";
+import { setUpdateField1, setUpdateField2, setUpdateField3, setUpdateField4, setUpdateField5 } from '../../redux/redux'
 
 const UpdateSelect = () => {
-  const [items, setItems] = React.useState([])
+  const [items, setItems] = React.useState('')
 
+  const dispatch = useDispatch()
   const navigation = useNavigation()
 
   const handleBack = () => {
@@ -14,8 +17,19 @@ const UpdateSelect = () => {
   }
 
   const handleNext = () => {
+    dispatch(setUpdateField1(items[0]))
+    dispatch(setUpdateField2(items[1]))
+    dispatch(setUpdateField3(items[2]))
+    dispatch(setUpdateField4(items[3]))
+    dispatch(setUpdateField5(items[4]))
     navigation.navigate('UpdateField1')
   }
+
+  const addItem = input => {
+    setItems([...items, input])
+  }
+
+  console.log(items)
 
   return (
     <View style={styles.container}>
@@ -30,7 +44,15 @@ const UpdateSelect = () => {
       <View style={styles.topTextWrapper}>
         <Text style={styles.topText}>Customize your update</Text>
       </View>
-      <View style={styles.multiSelectWrapper}>
+      <View>
+        <TextInput
+          style={styles.textBox}
+          multiline={true}
+          placeholder="start typing"
+          value={items}
+          onChangeText={text => addItem(text)}
+          autoCapitalize="sentences"
+        />
       </View>
       <View style={styles.nextButtonWrapper}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
@@ -74,17 +96,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
-  multiSelectWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderWidth: 1,
+  textBox: {
+    padding: 20,
+    height: 400,
+    width: 300,
     borderRadius: 10,
+    borderWidth: 2,
     borderColor: 'black',
-    width: '95%',
-    height: '60%',
-    position: 'absolute',
-    top: '30%',
+    backgroundColor: 'white',
   },
   nextButtonWrapper: {
     position: 'absolute',

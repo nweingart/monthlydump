@@ -3,9 +3,16 @@ import {View, Text, StyleSheet, TouchableOpacity, TextInput, Image} from 'react-
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useNavigation} from "@react-navigation/native";
 import SmallLogo from '../../assets/logoSimple.png'
+import { useDispatch, useSelector } from "react-redux";
 
 const UpdateField1 = () => {
-  const [items, setItems] = React.useState([])
+  const [update, setUpdate] = React.useState('')
+  const dispatch = useDispatch()
+  const updateField1 = useSelector(state => state.updateField1)
+
+  const characterCount = update.length
+
+  const disabled = characterCount > 500
 
   const navigation = useNavigation()
 
@@ -14,8 +21,15 @@ const UpdateField1 = () => {
   }
 
   const handleNext = () => {
-    navigation.navigate('UpdateField2')
+    if (disabled) {
+      alert('You may only use 500 characters per update.')
+    } else {
+      navigation.navigate('UpdateField2')
+    }
   }
+
+  React.useEffect(() => {
+  }, [characterCount])
 
   return (
     <View style={styles.container}>
@@ -28,9 +42,20 @@ const UpdateField1 = () => {
         <Image source={SmallLogo} />
       </View>
       <View style={styles.topTextWrapper}>
-        <Text style={styles.topText}>Update Field 1</Text>
+        <Text style={styles.topText}>{updateField1}</Text>
       </View>
-      <View style={styles.multiSelectWrapper}>
+      <View>
+        <TextInput
+          style={styles.textBox}
+          multiline={true}
+          placeholder="start typing"
+          value={update}
+          onChangeText={text => setUpdate(text)}
+          autoCapitalize="sentences"
+          />
+      </View>
+      <View style={styles.characterCount}>
+        <Text>{characterCount}</Text>
       </View>
       <View style={styles.nextButtonWrapper}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
@@ -74,17 +99,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
-  multiSelectWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderWidth: 1,
+  textBox: {
+    padding: 20,
+    height: 400,
+    width: 300,
     borderRadius: 10,
+    borderWidth: 2,
     borderColor: 'black',
-    width: '95%',
-    height: '60%',
+    backgroundColor: 'white',
+  },
+  characterCount: {
     position: 'absolute',
-    top: '30%',
+    top: '85%',
   },
   nextButtonWrapper: {
     position: 'absolute',

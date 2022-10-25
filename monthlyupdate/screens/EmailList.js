@@ -23,13 +23,18 @@ const EmailList = () => {
           <Ionicons name="arrow-back-outline" size='25' />
         </TouchableOpacity>
       </View>
-      <View>
-       <TextInput
-
-       />
+      <View style={styles.addEmailButton}>
+        <TouchableOpacity>
+          <Ionicons name="add-circle-outline" size='25'/>
+        </TouchableOpacity>
       </View>
-      <View>
-
+      <View style={styles.emailListWrapper}>
+        <View style={styles.emailListItem}>
+          <Text style={styles.emailListItem}>Email 1</Text>
+          <TouchableOpacity style={styles.minusIcon}>
+            <Ionicons  name="remove-circle-outline" size='25'/>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
@@ -51,6 +56,30 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '7.5%',
     left: '7.5%',
+  },
+  addEmailButton: {
+    position: 'absolute',
+    top: '25%',
+    left: '55%',
+  },
+  emailListWrapper: {
+    paddingVertical: 20,
+    position: 'absolute',
+    top: '35%',
+    backgroundColor: 'white',
+    height: '60%',
+    width: '90%',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'black',
+  },
+  emailListItem: {
+    flexDirection:'row',
+    margin: 10,
+  },
+  minusIcon: {
+    marginLeft: 175,
+    marginTop: 5,
   }
 })
 
