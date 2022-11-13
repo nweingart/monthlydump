@@ -1,11 +1,14 @@
 import React from 'react'
-import {KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native'
+import {Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native'
 import { auth } from '../Firebase'
 import {useNavigation} from "@react-navigation/native";
+import LogoFull from "../assets/logoFull.png";
 
 const Register = () => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [firstName, setFirstName] = React.useState('')
+  const [lastName, setLastName] = React.useState('')
 
   const navigation = useNavigation()
 
@@ -18,17 +21,17 @@ const Register = () => {
     return unsubscribe
   }, [])
 
-  const handleSignUp = () => {
+  const handleLogin = () => {
     auth
       .createUserWithEmailAndPassword(email, password)
       .then(userCredentials => {
         const user = userCredentials.user
-        console.log(`new account created with ${user.email}`)
+        console.log(`logged in with email ${user.email}`)
       })
       .catch(error => alert(error.message))
   }
 
-  const handleLogin = () => {
+  const handleRegister = () => {
     navigation.replace("Login")
   }
 
@@ -37,6 +40,9 @@ const Register = () => {
       style={styles.container}
       behavior="padding"
     >
+      <View style={styles.logoWrapper}>
+        <Image source={LogoFull} />
+      </View>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="email"
@@ -52,17 +58,29 @@ const Register = () => {
           style={styles.input}
           secureTextEntry={true}
         />
+        <TextInput
+          placeholder="first name"
+          value={firstName}
+          onChangeText={text => setFirstName(text)}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="last name"
+          value={lastName}
+          onChangeText={text => setLastName(text)}
+          style={styles.input}
+        />
       </View>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
+          onPress={handleLogin}
+          style={styles.button}
         >
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.loginIn}>
-        <Text onPress={handleLogin}>
+      <View style={styles.register}>
+        <Text style={styles.bottomText} onPress={handleRegister}>
           Already have an account? Login here
         </Text>
       </View>
@@ -74,7 +92,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: '#ACECC2',
+  },
+  logoWrapper: {
+    position: 'absolute',
+    top: '20%',
   },
   inputContainer: {
     width: '80%'
@@ -93,26 +116,32 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   button: {
+    justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
-    backgroundColor: 'orange',
+    backgroundColor: 'white',
     padding: 15,
     borderRadius: 10,
     borderColor: 'gray',
     borderWidth: 1,
   },
   buttonText: {
-    color: 'white',
+    color: 'black',
     fontWeight: '700',
     fontSize: 16,
   },
   buttonOutline: {
-    backgroundColor: 'orange',
+    backgroundColor: 'white',
     marginTop: 10,
     borderColor: 'gray',
     borderWidth: 1,
   },
-  loginIn: {
-    marginTop: 25,
+  register: {
+    marginTop: 50,
+  },
+  bottomText: {
+    fontWeight: '700',
+    fontSize: 14
   }
 })
 
