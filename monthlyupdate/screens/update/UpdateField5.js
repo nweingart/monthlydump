@@ -23,7 +23,7 @@ const UpdateField5 = () => {
     if (disabled) {
       alert('You may only use 500 characters per update.')
     } else {
-      navigation.navigate('UpdateField1')
+      navigation.navigate('Review')
     }
   }
 

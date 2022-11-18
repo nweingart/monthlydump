@@ -9,6 +9,9 @@ import { xorBy } from 'lodash'
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 
+// redux imports
+import { setUpdateField1, setUpdateField2, setUpdateField3, setUpdateField4, setUpdateField5 } from '../../redux/redux'
+
 
 const OPTIONS = [
   {
@@ -45,14 +48,24 @@ const OPTIONS = [
   },
 ]
 
-const onFinish = () => {
-
-}
-
 const UpdateSelect = () => {
-  const [selectedTeams, setSelectedTeams] = useState([])
+  const [selectedItems, setSelectedItems] = useState([])
   const dispatch = useDispatch()
   const navigation = useNavigation()
+
+
+
+  const handleNext = () => {
+    dispatch(setUpdateField1(selectedItems[0].item))
+    dispatch(setUpdateField2(selectedItems[1].item))
+    dispatch(setUpdateField3(selectedItems[2].item))
+    dispatch(setUpdateField4(selectedItems[3].item))
+    dispatch(setUpdateField5(selectedItems[4].item))
+    navigation.navigate('UpdateField1')
+  }
+
+  console.log(selectedItems[0])
+
   return (
     <View style={{ padding: 25, backgroundColor: '#ACECC2', height: '100%', width: '100%' }}>
       <View style={{ height: 40 }} />
@@ -62,21 +75,21 @@ const UpdateSelect = () => {
         multiOptionsLabelStyle={{ color: 'black', padding: 10 }}
         label="Select multiple"
         options={OPTIONS}
-        selectedValues={selectedTeams}
+        selectedValues={selectedItems}
         onMultiSelect={onMultiChange()}
         onTapClose={onMultiChange()}
         isMulti
       />
-      <Text>You have {selectedTeams.length} / out of 5 items selected!</Text>
-      <Text style={{ color: 'red'}}>{ selectedTeams.length > 5 ? 'You may only select 5 items per update!' : null}</Text>
-      <TouchableOpacity disabled={selectedTeams.length > 5} style={{ backgroundColor: 'black'}}>
+      <Text>You have {selectedItems.length} / out of 5 items selected!</Text>
+      <Text style={{ color: 'red'}}>{ selectedItems.length > 5 ? 'You may only select 5 items per update!' : null}</Text>
+      <TouchableOpacity disabled={selectedItems.length !== 5} style={{ backgroundColor: 'black'}} onPress={handleNext}>
         <Text style={{ color: 'white'}}>Next</Text>
       </TouchableOpacity>
     </View>
   )
 
   function onMultiChange() {
-    return (item) => setSelectedTeams(xorBy(selectedTeams, [item], 'id'))
+    return (item) => setSelectedItems(xorBy(selectedItems, [item], 'id'))
   }
 
 }

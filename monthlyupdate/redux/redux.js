@@ -52,7 +52,7 @@ const setUpdateField4 = (updateField4) => {
 
 const setUpdateField5 = (updateField5) => {
   return {
-    type: 'updateField4',
+    type: 'updateField5',
     value: updateField5
   }
 }
