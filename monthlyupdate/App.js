@@ -16,8 +16,8 @@ import UpdateField2 from "./screens/update/UpdateField2"
 import UpdateField3 from "./screens/update/UpdateField3"
 import UpdateField4 from "./screens/update/UpdateField4"
 import UpdateField5 from "./screens/update/UpdateField5"
-import Review from "./screens/Review"
-import Images from './screens/update/Images'
+import Preview from "./screens/Preview"
+import Confirmation from "./screens/Confirmation"
 
 const Stack = createNativeStackNavigator()
 
@@ -36,8 +36,8 @@ const App = () => {
           <Stack.Screen options={{ headerShown: false }} name="UpdateField3" component={UpdateField3} />
           <Stack.Screen options={{ headerShown: false }} name="UpdateField4" component={UpdateField4} />
           <Stack.Screen options={{ headerShown: false }} name="UpdateField5" component={UpdateField5} />
-          <Stack.Screen options={{ headerShown: false }} name="Review" component={Review} />
-          <Stack.Scrren options={{ headerShown: false }} name="Images" component={Images} />
+          <Stack.Screen options={{ headerShown: false }} name="Preview" component={Preview} />
+          <Stack.Screen options={{ headerShown: false }} name="Confirmation" component={Confirmation} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

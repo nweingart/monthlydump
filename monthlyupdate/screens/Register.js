@@ -3,6 +3,9 @@ import {Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpaci
 import { auth } from '../Firebase'
 import {useNavigation} from "@react-navigation/native";
 import LogoFull from "../assets/logoFull.png";
+import {setUserFirstName, setUserLastName} from '../redux/redux'
+import { useDispatch } from "react-redux";
+
 
 const Register = () => {
   const [email, setEmail] = React.useState('')
@@ -11,6 +14,7 @@ const Register = () => {
   const [lastName, setLastName] = React.useState('')
 
   const navigation = useNavigation()
+  const dispatch = useDispatch()
 
   React.useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -32,7 +36,7 @@ const Register = () => {
   }
 
   const handleRegister = () => {
-    navigation.replace("Login")
+    dispatch(navigation.replace("Login"))
   }
 
   return (

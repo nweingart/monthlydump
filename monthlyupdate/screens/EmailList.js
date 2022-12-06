@@ -1,19 +1,51 @@
 import React from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, Pressable, Image, Modal, TextInput} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Pressable, Image, Modal, TextInput, FlatList} from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useNavigation} from "@react-navigation/native";
 import SmallLogo from "../assets/logoSimple.png";
 
 const EmailList = () => {
+  const initialList = [{
+    id: 1,
+    email: 'nweingart12@gmail.com'
+  }]
+
   const [modalVisible, setModalVisible] = React.useState(false)
   const [email, setEmail] = React.useState('')
-  const [emailList, setEmailList] = React.useState([])
+  const [emailList, setEmailList] = React.useState(initialList)
+
 
   const navigation = useNavigation()
+
+  const handleChange = (text) => {
+    setEmail(text)
+  }
+
+  const handleAdd = () => {
+    const newList = emailList.concat({ id: emailList.length + 1, email: email })
+    setModalVisible(false)
+    setEmailList(newList)
+  }
 
   const handleBack = () => {
     navigation.goBack()
   }
+
+  const Item = ({ item }) => (
+    <View>
+      <Text>{item.email}</Text>
+    </View>
+)
+
+  const renderItem = ({ item }) => {
+    return (
+      <Item
+        item={item}
+        />
+    )
+  }
+
+  console.log(emailList)
 
   return (
     <View style={styles.container}>
@@ -32,12 +64,7 @@ const EmailList = () => {
       </View>
       <View style={styles.emailListWrapper}>
         <View style={styles.emailListItem}>
-          <Text style={styles.emailListItem}>{email}</Text>
-          {email !== '' && (
-            <TouchableOpacity style={styles.minusIcon}>
-              <Ionicons  name="remove-circle-outline" size='25'/>
-            </TouchableOpacity>
-          )}
+          <FlatList data={emailList} renderItem={renderItem} keyExtractor={item => item.id} />
         </View>
       </View>
       <View style={styles.centeredView}>
@@ -51,23 +78,23 @@ const EmailList = () => {
             }}
           >
             <View style={styles.modalView}>
-              <Pressable
-                style={styles.buttonClose}
-                onPress={() => setModalVisible(!modalVisible)}
-              >
-                <Text style={styles.textStyle}>x</Text>
-              </Pressable>
+              <TouchableOpacity style={styles.buttonClose} onPress={handleBack}>
+                <Ionicons name="close-outline" size='25'/>
+              </TouchableOpacity>
             </View>
             <View>
               <Text style={styles.modalText}>Add Email</Text>
               <TextInput
                 style={styles.input}
-                onChangeText={setEmail}
+                autoCapitalize="none"
+                onChangeText={handleChange}
                 value={email}
               />
             </View>
             <View>
-              <Text>{email}</Text>
+              <TouchableOpacity style={styles.modalButton} onPress={handleAdd}>
+                <Text>Add Email</Text>
+              </TouchableOpacity>
             </View>
           </Modal>
         </View>
@@ -142,7 +169,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F194FF",
   },
   buttonClose: {
-    backgroundColor: "#2196F3",
     position: 'absolute',
     top: '5%',
     left: '5%'
@@ -151,7 +177,17 @@ const styles = StyleSheet.create({
     height: 40,
     margin: 12,
     borderWidth: 1,
-  }
+    borderRadius: 8,
+  },
+  modalButton: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ACECC2',
+    marginHorizontal: 10,
+    borderRadius: 8,
+    height: 40,
+  },
 })
 
 export default EmailList

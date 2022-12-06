@@ -10,9 +10,9 @@ const transporter = nodemailer.createTransport({
 
 const options = {
   from: 'Update: Ned Weingart',
-  to: ['nweingart12@gmail.com', 'ned@oos-studio.com'],
+  to: ['nweingart12@gmail.com', 'zachames@hotmail.com'],
   subject: 'first automated email',
-  html: '<h1>hello Ned</h1> <img src="https://i.imgur.com/7YFbH2x.jpg" />'
+  html: '<h1>hello world</h1>'
 }
 
 transporter.sendMail(options, (err, info) => {
