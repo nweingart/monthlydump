@@ -5,11 +5,10 @@ import {useNavigation} from "@react-navigation/native";
 import LogoNew from '../../assets/LogoNew.png'
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
-import { setUpdate1 } from "../../redux/redux";
+import { setUpdate2, setUpdate2Image } from "../../redux/redux";
 
 const UpdateField2 = () => {
   const [update, setUpdate] = React.useState('')
-  const [update2, setUpdate2] = React.useState('')
   const [image, setImage] = React.useState(null);
 
   const pickImage = async () => {
@@ -31,10 +30,9 @@ const UpdateField2 = () => {
   const dispatch = useDispatch()
   const updateField2 = useSelector(state => state.updateField2)
 
-  const characterCount = 150 - update.length
-  const characterCount2 = 150 - update2.length
+  const characterCount = 200 - update.length
 
-  const disabled = characterCount > 150
+  const disabled = characterCount > 200
 
   const navigation = useNavigation()
 
@@ -46,7 +44,8 @@ const UpdateField2 = () => {
     if (disabled) {
       alert('You may only use 500 characters per update.')
     } else {
-      dispatch(setUpdate1(update))
+      dispatch(setUpdate2(update))
+      dispatch(setUpdate2Image(image))
       navigation.navigate('UpdateField3')
     }
   }
@@ -67,7 +66,7 @@ const UpdateField2 = () => {
       <View style={styles.topTextWrapper}>
         <Text style={styles.topText}>{updateField2}</Text>
       </View>
-      <View style={{ flexDirection: 'row', marginBottom: 30}}>
+      <View style={{ flexDirection: 'row', marginBottom: '30%'}}>
         <TextInput
           style={styles.textBox}
           multiline={true}
@@ -77,17 +76,6 @@ const UpdateField2 = () => {
           autoCapitalize="sentences"
         />
         <Text style={ characterCount < 25 ? styles.characterCount2 : styles.characterCount}>{characterCount}</Text>
-      </View>
-      <View style={{ flexDirection: 'row', marginBottom: 30}}>
-        <TextInput
-          style={styles.textBox}
-          multiline={true}
-          placeholder="start typing"
-          value={update2}
-          onChangeText={text => setUpdate2(text)}
-          autoCapitalize="sentences"
-        />
-        <Text style={ characterCount2 < 25 ? styles.characterCount2 : styles.characterCount}>{characterCount2}</Text>
       </View>
       <View style={{ flexDirection: 'row'}}>
         <View style={{ marginRight: 150}}>
@@ -147,7 +135,7 @@ const styles = StyleSheet.create({
   },
   textBox: {
     padding: 35,
-    height: 175,
+    height: 225,
     width: 300,
     borderRadius: 10,
     borderWidth: 2,
