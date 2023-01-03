@@ -3,10 +3,12 @@ import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native'
 import {useNavigation} from "@react-navigation/native";
 import {auth} from "../Firebase";
 import LogoFull from '../assets/logoFull.png'
+import { useSelector } from "react-redux";
 
 
 const Home = () => {
   const navigation = useNavigation()
+  const submitted = useSelector(state => state.updateSubmitted)
 
   const handleSignOut = () => {
     auth.signOut()
@@ -21,7 +23,7 @@ const Home = () => {
   }
 
   const handleUpdateClick = () => {
-    navigation.navigate("UpdateSelect")
+    submitted === true ? navigation.navigate("Preview") : navigation.navigate("UpdateSelect")
   }
 
   return (
@@ -37,7 +39,7 @@ const Home = () => {
       <View style={styles.linkWrapper}>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleUpdateClick}>
           <Text style={styles.linkButtonText}>
-            Create Update
+            {submitted ? "View Update" : "Create Update"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleEmailListClick}>

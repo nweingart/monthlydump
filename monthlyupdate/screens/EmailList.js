@@ -1,30 +1,44 @@
 import React from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, Pressable, Image, Modal, TextInput, FlatList} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput, FlatList} from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useNavigation} from "@react-navigation/native";
 import SmallLogo from "../assets/logoSimple.png";
+import { setMailingList } from "../redux/redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const EmailList = () => {
-  const initialList = [{
-    id: 1,
-    email: 'nweingart12@gmail.com'
-  }]
 
   const [modalVisible, setModalVisible] = React.useState(false)
   const [email, setEmail] = React.useState('')
-  const [emailList, setEmailList] = React.useState(initialList)
 
+  const mailingList = useSelector(state => state.mailingList) || []
 
+  const dispatch = useDispatch()
   const navigation = useNavigation()
 
   const handleChange = (text) => {
     setEmail(text)
   }
 
+  const checkEmail = (email) => {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return re.test(String(email).toLowerCase())
+  }
+
   const handleAdd = () => {
-    const newList = emailList.concat({ id: emailList.length + 1, email: email })
-    setModalVisible(false)
-    setEmailList(newList)
+    if (checkEmail(email) === true) {
+      const newList = mailingList.concat({id: mailingList.length + 1, email: email})
+      setModalVisible(false)
+      dispatch(setMailingList(newList))
+      setEmail('')
+    } else {
+      alert('Please enter a valid email address')
+    }
+  }
+
+  const handleDelete = (id) => {
+    const newList = mailingList.filter(item => item.id !== id)
+    dispatch(setMailingList(newList))
   }
 
   const handleBack = () => {
@@ -33,7 +47,12 @@ const EmailList = () => {
 
   const Item = ({ item }) => (
     <View>
-      <Text>{item.email}</Text>
+      <View style={styles.emailListItem}>
+        <Text>{item.email}</Text>
+        <TouchableOpacity>
+          <Ionicons name="trash" size={20} color="black" onPress={() => handleDelete(item.id)} />
+        </TouchableOpacity>
+      </View>
     </View>
 )
 
@@ -44,8 +63,6 @@ const EmailList = () => {
         />
     )
   }
-
-  console.log(emailList)
 
   return (
     <View style={styles.container}>
@@ -64,7 +81,7 @@ const EmailList = () => {
       </View>
       <View style={styles.emailListWrapper}>
         <View style={styles.emailListItem}>
-          <FlatList data={emailList} renderItem={renderItem} keyExtractor={item => item.id} />
+          <FlatList data={mailingList ? mailingList : emailList} renderItem={renderItem} keyExtractor={item => item.id} />
         </View>
       </View>
       <View style={styles.centeredView}>
@@ -87,6 +104,7 @@ const EmailList = () => {
               <TextInput
                 style={styles.input}
                 autoCapitalize="none"
+                textContentType={'emailAddress'}
                 onChangeText={handleChange}
                 value={email}
               />
@@ -149,7 +167,8 @@ const styles = StyleSheet.create({
     borderColor: 'black',
   },
   emailListItem: {
-    flexDirection:'row',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     margin: 10,
   },
   minusIcon: {

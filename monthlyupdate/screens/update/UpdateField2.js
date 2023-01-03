@@ -30,14 +30,18 @@ const UpdateField2 = () => {
   const dispatch = useDispatch()
   const updateField2 = useSelector(state => state.updateField2)
 
-  const characterCount = 200 - update.length
+  const characterCount = 280 - update.length
 
-  const disabled = characterCount > 200
+  const disabled = characterCount > 280
 
   const navigation = useNavigation()
 
   const handleBack = () => {
     navigation.goBack()
+  }
+
+  const clearUpdate = () => {
+    setUpdate('')
   }
 
   const handleNext = () => {
@@ -76,6 +80,11 @@ const UpdateField2 = () => {
           autoCapitalize="sentences"
         />
         <Text style={ characterCount < 25 ? styles.characterCount2 : styles.characterCount}>{characterCount}</Text>
+      </View>
+      <View style={styles.clearButton}>
+        <TouchableOpacity onPress={clearUpdate}>
+          <Text>Clear Update</Text>
+        </TouchableOpacity>
       </View>
       <View style={{ flexDirection: 'row'}}>
         <View style={{ marginRight: 150}}>
@@ -157,6 +166,11 @@ const styles = StyleSheet.create({
   },
   buttonsWrapper: {
     flexDirection: 'row',
+  },
+  clearButton: {
+    position: 'absolute',
+    top: '66%',
+    left: '20%',
   },
   nextButtonWrapper: {
     position: 'absolute',

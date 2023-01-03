@@ -8,6 +8,7 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case "mailingList": return {...state, mailingList: action.value}
     case "updateField1": return { ...state, updateField1: action.value}
     case "update1": return { ...state, update1: action.value}
     case "update1Image": return { ...state, update1Image: action.value}
@@ -23,12 +24,20 @@ const reducer = (state = initialState, action) => {
     case "updateField5": return { ...state, updateField5: action.value}
     case "update5": return { ...state, update5: action.value}
     case "update5Image": return { ...state, update5Image: action.value}
+    case "updateSubmitted": return { ...state, updateSubmitted: action.value}
     default: return state
   }
 }
 
 const store = createStore(reducer, applyMiddleware(thunkMiddleWare))
 export { store }
+
+const setMailingList = (mailingList) => {
+  return {
+    type: 'mailingList',
+    value: mailingList
+  }
+}
 
 const setUpdateField1 = (updateField1) => {
   return {
@@ -136,7 +145,15 @@ const setUpdate5Image = (update5Image) => {
   }
 }
 
+const setUpdateSubmitted = (updateSubmitted) => {
+  return {
+    type: 'updateSubmitted',
+    value: updateSubmitted
+  }
+}
+
 export {
+  setMailingList,
   setUpdateField1,
   setUpdate1,
   setUpdate1Image,
@@ -151,5 +168,6 @@ export {
   setUpdate4Image,
   setUpdate5,
   setUpdateField5,
-  setUpdate5Image
+  setUpdate5Image,
+  setUpdateSubmitted,
 }
