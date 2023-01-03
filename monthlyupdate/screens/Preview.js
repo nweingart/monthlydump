@@ -19,9 +19,10 @@ const Preview = () => {
   const image4 = useSelector(state => state.update4Image)
   const update5 = useSelector(state => state.update5)
   const image5 = useSelector(state => state.update5Image)
+  const submitted = useSelector(state => state.updateSubmitted)
 
   const handleBack = () => {
-    navigation.goBack()
+    submitted ? navigation.navigate('Home') : navigation.goBack()
   }
 
   const handleConfirm = () => {
@@ -60,12 +61,16 @@ const Preview = () => {
       <SafeAreaView style={styles.contentWrapper}>
         <FlatList data={data} renderItem={renderImage} />
       </SafeAreaView>
-      <View style={styles.nextButtonWrapper}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleConfirm}>
-          <Text style={styles.nextButtonText}>Submit</Text>
-          <Ionicons name="arrow-forward-outline" size='25' />
-        </TouchableOpacity>
-      </View>
+      {
+        !submitted ? (
+          <View style={styles.nextButtonWrapper}>
+            <TouchableOpacity style={styles.nextButton} onPress={handleConfirm}>
+              <Text style={styles.nextButtonText}>Submit</Text>
+              <Ionicons name="arrow-forward-outline" size='25' />
+            </TouchableOpacity>
+          </View>
+        ) : null
+      }
     </View>
   )
 }
