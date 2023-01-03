@@ -6,15 +6,15 @@ import {useSelector} from "react-redux";
 
 const Preview = () => {
   const navigation = useNavigation()
-  const update1 = useSelector(state => state.update1)
+  //const update1 = useSelector(state => state.update1)
   const image1 = useSelector(state => state.update1Image)
-  const update2 = useSelector(state => state.update2)
+  //const update2 = useSelector(state => state.update2)
   const image2 = useSelector(state => state.update2Image)
-  const update3 = useSelector(state => state.update3)
+  //const update3 = useSelector(state => state.update3)
   const image3 = useSelector(state => state.update3Image)
-  const update4 = useSelector(state => state.update4)
+ // const update4 = useSelector(state => state.update4)
   const image4 = useSelector(state => state.update4Image)
-  const update5 = useSelector(state => state.update5)
+  //const update5 = useSelector(state => state.update5)
   const image5 = useSelector(state => state.update5Image)
 
   const handleBack = () => {
