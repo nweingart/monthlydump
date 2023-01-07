@@ -1,5 +1,4 @@
-// Import the functions you need from the SDKs you need
-import * as firebase from "firebase"
+const firebase = require('firebase');
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,8 +21,6 @@ if (firebase.apps.length === 0) {
 } else {
   app = firebase.app()
 }
-
-const auth = firebase.auth()
 const db = firebase.firestore()
 
-export { auth, db }
+module.exports = db;

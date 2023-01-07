@@ -4,22 +4,57 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { setUpdateSubmitted } from "../redux/redux";
+import { db } from '../Firebase'
 
 const Preview = () => {
   const navigation = useNavigation()
   const dispatch = useDispatch()
-
+  const userId = '1'
+  const month = 'january2023'
+  const topic1 = useSelector(state => state.updateField1)
   const update1 = useSelector(state => state.update1)
   const image1 = useSelector(state => state.update1Image)
+  const topic2 = useSelector(state => state.updateField2)
   const update2 = useSelector(state => state.update2)
   const image2 = useSelector(state => state.update2Image)
+  const topic3 = useSelector(state => state.updateField3)
   const update3 = useSelector(state => state.update3)
   const image3 = useSelector(state => state.update3Image)
+  const topic4 = useSelector(state => state.updateField4)
   const update4 = useSelector(state => state.update4)
   const image4 = useSelector(state => state.update4Image)
+  const topic5 = useSelector(state => state.updateField5)
   const update5 = useSelector(state => state.update5)
   const image5 = useSelector(state => state.update5Image)
   const submitted = useSelector(state => state.updateSubmitted)
+
+  const handleRead = () => {
+    db.collection("updates").add({
+      userId: userId,
+      month: month,
+      update1Topic: topic1,
+      update1Text: update1,
+      update1Image: image1,
+      update2Topic: topic2,
+      update2Text: update2,
+      update2Image: image2,
+      update3Topic: topic3,
+      update3Text: update3,
+      update3Image: image3,
+      update4Topic: topic4,
+      update4Text: update4,
+      update4Image: image4,
+      update5Topic: topic5,
+      update5Text: update5,
+      update5Image: image5,
+    })
+      .then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+  }
 
   const handleBack = () => {
     submitted ? navigation.navigate('Home') : navigation.goBack()
@@ -27,8 +62,11 @@ const Preview = () => {
 
   const handleConfirm = () => {
     dispatch(setUpdateSubmitted(true))
+    handleRead()
     navigation.navigate('Confirmation')
   }
+
+
 
   const data = [
     { id: 1, uri: image1, text: update1 },
