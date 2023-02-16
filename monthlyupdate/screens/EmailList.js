@@ -13,6 +13,7 @@ const EmailList = () => {
 
   const mailingList = useSelector(state => state.mailingList) || []
 
+
   const dispatch = useDispatch()
   const navigation = useNavigation()
 

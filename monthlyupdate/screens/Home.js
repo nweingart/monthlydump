@@ -1,14 +1,15 @@
 import React from 'react'
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native'
-import {useNavigation} from "@react-navigation/native";
-import {auth} from "../Firebase";
+import {useNavigation} from "@react-navigation/native"
+import {auth} from "../Firebase"
 import LogoFull from '../assets/logoFull.png'
-import { useSelector } from "react-redux";
+import { useSelector } from "react-redux"
 
 
 const Home = () => {
   const navigation = useNavigation()
-  const submitted = useSelector(state => state.updateSubmitted)
+  const submitted = false
+  const user = auth.currentUser
 
   const handleSignOut = () => {
     auth.signOut()
@@ -16,6 +17,10 @@ const Home = () => {
         navigation.replace("Login")
       })
       .catch(error => alert(error.message))
+  }
+
+  if (!user) {
+    handleSignOut()
   }
 
   const handleEmailListClick = () => {
@@ -33,9 +38,6 @@ const Home = () => {
           <Text>Log Out</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.logoWrapper}>
-        <Image source={LogoFull} />
-      </View>
       <View style={styles.linkWrapper}>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleUpdateClick}>
           <Text style={styles.linkButtonText}>
@@ -44,7 +46,7 @@ const Home = () => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleEmailListClick}>
           <Text style={styles.linkButtonText}>
-            View Email List
+            Edit Mailing List
           </Text>
         </TouchableOpacity>
       </View>
@@ -61,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ACECC2',
+    backgroundColor: 'snow',
   },
   logoWrapper: {
     position: 'absolute',
@@ -81,7 +83,7 @@ const styles = StyleSheet.create({
   linkButtonWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#ACECC2',
     borderRadius: 10,
     height: 50,
     width: 300,

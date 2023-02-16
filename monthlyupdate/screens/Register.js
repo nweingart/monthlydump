@@ -1,29 +1,21 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native'
 import { auth } from '../Firebase'
-import {useNavigation} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import LogoFull from "../assets/logoFull.png";
-import {setUserFirstName, setUserLastName} from '../redux/redux'
 import { useDispatch } from "react-redux";
 
 
 const Register = () => {
-  const [email, setEmail] = React.useState('')
-  const [password, setPassword] = React.useState('')
-  const [firstName, setFirstName] = React.useState('')
-  const [lastName, setLastName] = React.useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
 
   const navigation = useNavigation()
   const dispatch = useDispatch()
 
-  React.useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if (user) {
-        navigation.replace("Home")
-      }
-    })
-    return unsubscribe
-  }, [])
 
   const handleLogin = () => {
     auth
@@ -34,6 +26,15 @@ const Register = () => {
       })
       .catch(error => alert(error.message))
   }
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        navigation.replace("Home")
+      }
+    })
+    return unsubscribe
+  }, [])
 
   const handleRegister = () => {
     dispatch(navigation.replace("Login"))
@@ -52,6 +53,13 @@ const Register = () => {
           placeholder="email"
           value={email}
           onChangeText={text => setEmail(text)}
+          style={styles.input}
+          autoCapitalize="none"
+        />
+        <TextInput
+          placeholder="username"
+          value={username}
+          onChangeText={text => setUsername(text)}
           style={styles.input}
           autoCapitalize="none"
         />
@@ -97,7 +105,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ACECC2',
+    backgroundColor: 'snow',
   },
   logoWrapper: {
     position: 'absolute',

@@ -1,15 +1,27 @@
 import React from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, TextInput, Image} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, TextInput, Image, SafeAreaView, FlatList} from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useNavigation} from "@react-navigation/native";
 import LogoNew from '../../assets/LogoNew.png'
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { setUpdate2, setUpdate2Image } from "../../redux/redux";
+import { storage } from '../../Firebase'
 
 const UpdateField2 = () => {
   const [update, setUpdate] = React.useState('')
   const [image, setImage] = React.useState(null);
+
+  const submitPhoto = async () => {
+    const uploadUri = image
+    let filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1)
+
+    try {
+      await storage.ref(filename).put(uploadUri)
+    } catch(err) {
+      console.log(err)
+    }
+  }
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -44,10 +56,14 @@ const UpdateField2 = () => {
     setUpdate('')
   }
 
+  console.log(image)
+
   const handleNext = () => {
     if (disabled) {
-      alert('You may only use 500 characters per update.')
+      alert('You may only use 280 characters per update.')
     } else {
+      submitPhoto()
+        .then(() => console.log('photo submitted!'))
       dispatch(setUpdate2(update))
       dispatch(setUpdate2Image(image))
       navigation.navigate('UpdateField3')
@@ -61,49 +77,40 @@ const UpdateField2 = () => {
     <View style={styles.container}>
       <View style={styles.backButtonWrapper}>
         <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back-outline" size='25' />
+          <Ionicons name="arrow-back-outline" size='25' color={'#ACECC2'} />
         </TouchableOpacity>
       </View>
-      <View style={styles.logoWrapper}>
-        <Image source={LogoNew} style={{ width: 50, height: 50}}/>
+      <View style={styles.titleWrapper}>
+        <Text style={styles.pageTitle}>{updateField2}</Text>
       </View>
-      <View style={styles.topTextWrapper}>
-        <Text style={styles.topText}>{updateField2}</Text>
-      </View>
-      <View style={{ flexDirection: 'row', marginBottom: '30%'}}>
-        <TextInput
-          style={styles.textBox}
-          multiline={true}
-          placeholder="start typing"
-          value={update}
-          onChangeText={text => setUpdate(text)}
-          autoCapitalize="sentences"
-        />
-        <Text style={ characterCount < 25 ? styles.characterCount2 : styles.characterCount}>{characterCount}</Text>
-      </View>
-      <View style={styles.clearButton}>
-        <TouchableOpacity onPress={clearUpdate}>
-          <Text>Clear Update</Text>
+      <View style={styles.imageSectionWrapper}>
+        <TouchableOpacity onPress={pickImage} style={styles.addPictureButton}>
+          <Text style={{ marginLeft: '7.5%', fontWeight: 'bold', color: '#ACECC2' }}>Add Picture</Text>
+          { image && <Ionicons name="checkmark-circle-outline" size='25' style={{ marginLeft: '2.5%', marginTop: '-1%', color: '#ACECC2'}} /> }
         </TouchableOpacity>
+        <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          { image && <Image source={{ uri: image }} style={{ width: '90%', height: '100%', borderRadius: 15}} /> }
+        </View>
       </View>
-      <View style={{ flexDirection: 'row'}}>
-        <View style={{ marginRight: 150}}>
-          <View style={{ flexDirection: 'row'}}>
-            <TouchableOpacity style={styles.nextButton} onPress={pickImage}>
-              <Text style={styles.nextButtonText}>Add Picture</Text>
-              <Ionicons name="images-outline" size='25' />
-            </TouchableOpacity>
-            <View style={{ marginLeft: 10 }}>
-              { image && <Ionicons name="checkmark-circle-outline" size='25' /> }
-            </View>
-          </View>
+      <View style={styles.imageSectionWrapper}>
+        <Text style={{ marginLeft: '7.5%', fontWeight: 'bold', color: '#ACECC2', marginTop: 50 }}>Add Update</Text>
+        <View style={styles.textBoxWrapper}>
+          <TextInput
+            style={styles.textBox}
+            multiline={true}
+            placeholder="start typing"
+            value={update}
+            onChangeText={text => setUpdate(text)}
+            autoCapitalize="sentences"
+          />
+          <Text style={ characterCount < 25 ? styles.characterCount2 : styles.characterCount}>{characterCount}</Text>
         </View>
-        <View>
-          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={styles.nextButtonText}>Next</Text>
-            <Ionicons name="arrow-forward-outline" size='25' />
-          </TouchableOpacity>
-        </View>
+      </View>
+      <View style={styles.nextButtonWrapper}>
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext} disabled={disabled}>
+          <Text style={styles.nextText}>Next</Text>
+          <Ionicons name="arrow-forward-outline" size='25' color={'#ACECC2'} />
+        </TouchableOpacity>
       </View>
     </View>
   )
@@ -112,56 +119,64 @@ const UpdateField2 = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ACECC2',
-    padding: 25,
-    paddingTop: 100,
-  },
-  logoWrapper: {
-    position: 'absolute',
-    top: '10%',
+    backgroundColor: 'snow',
+    opacity: 0.9,
   },
   backButtonWrapper: {
-    position: 'absolute',
-    top: '7.5%',
-    left: '7.5%',
+    marginTop: 75,
+    marginLeft: 25,
   },
-  topTextWrapper:{
+  titleWrapper: {
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
-    backgroundColor: 'white',
-    width: '95%',
-    height: '5%',
-    position: 'absolute',
-    top: '20%',
   },
-  topText: {
-    color: 'black',
-    fontWeight: '700',
-    fontSize: 16,
+  pageTitle: {
+    fontSize: 30,
+    marginBottom: '5%',
+    color: '#ACECC2',
+    fontFamily: 'Avenir',
+    fontWeight: 'bold',
+  },
+  imageSectionWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: 300,
+  },
+  addPictureButton: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginBottom: '2.5%',
+  },
+  textBoxWrapper: {
+    marginTop: '10%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textBox: {
     padding: 35,
-    height: 225,
-    width: 300,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: 'black',
+    marginTop: -20,
+    paddingTop: 10,
+    height: 175,
+    width: 350,
+    borderRadius: 15,
+    borderColor: 'gray',
+    borderWidth: 1,
     backgroundColor: 'white',
   },
   characterCount: {
-    marginTop: 10,
-    marginLeft: -35,
-    fontWeight: 'bold',
-    opacity: 0.5
-  },
-  characterCount2: {
-    marginTop: 10,
-    marginLeft: -35,
+    marginTop: -25,
     fontWeight: 'bold',
     opacity: 0.5,
+    marginLeft: -275,
+    color: '#ACECC2',
+  },
+  characterCount2: {
+    marginTop: -25,
+    fontWeight: 'bold',
+    opacity: 0.5,
+    marginLeft: -275,
     color: 'red',
   },
   buttonsWrapper: {
@@ -174,19 +189,23 @@ const styles = StyleSheet.create({
   },
   nextButtonWrapper: {
     position: 'absolute',
-    top: '95%',
-    right: '10%',
+    bottom: '0%',
+    right: '5%',
   },
   nextButton: {
+    display: 'flex',
     flexDirection: 'row',
+    marginBottom: 75,
+    marginLeft: 300,
   },
-  nextButtonText: {
-    color: 'black',
-    fontWeight: '700',
+  nextText: {
     fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'Avenir',
     marginRight: 10,
     marginTop: 2.5,
-  }
+    color: '#ACECC2',
+  },
 })
 
 export default UpdateField2

@@ -1,7 +1,7 @@
 import React from 'react'
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "react-native-screens/native-stack";
-import { Provider } from "react-redux";
+import { createNativeStackNavigator } from "react-native-screens/native-stack"
+import { Provider } from "react-redux"
 import { store } from './redux/redux'
 
 
@@ -15,7 +15,6 @@ import UpdateField1 from "./screens/update/UpdateField1"
 import UpdateField2 from "./screens/update/UpdateField2"
 import UpdateField3 from "./screens/update/UpdateField3"
 import UpdateField4 from "./screens/update/UpdateField4"
-import UpdateField5 from "./screens/update/UpdateField5"
 import Preview from "./screens/Preview"
 import Confirmation from "./screens/Confirmation"
 
@@ -35,7 +34,6 @@ const App = () => {
           <Stack.Screen options={{ headerShown: false }} name="UpdateField2" component={UpdateField2} />
           <Stack.Screen options={{ headerShown: false }} name="UpdateField3" component={UpdateField3} />
           <Stack.Screen options={{ headerShown: false }} name="UpdateField4" component={UpdateField4} />
-          <Stack.Screen options={{ headerShown: false }} name="UpdateField5" component={UpdateField5} />
           <Stack.Screen options={{ headerShown: false }} name="Preview" component={Preview} />
           <Stack.Screen options={{ headerShown: false }} name="Confirmation" component={Confirmation} />
         </Stack.Navigator>
