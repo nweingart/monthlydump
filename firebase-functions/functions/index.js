@@ -33,6 +33,18 @@ exports.sendEmail = functions.https.onCall((data, context) => {
           const replacements = {
             name: data.name,
             month: data.month,
+            update1Topic: data.update1Topic,
+            update1Text: data.update1Text,
+            update1Image: data.update1Image,
+            update2Topic: data.update2Topic,
+            update2Text: data.update2Text,
+            update2Image: data.update2Image,
+            update3Topic: data.update3Topic,
+            update3Text: data.update3Text,
+            update3Image: data.update3Image,
+            update4Topic: data.update4Topic,
+            update4Text: data.update4Text,
+            update4Image: data.update4Image,
           };
           const htmlToSend = template(replacements);
           const options = {

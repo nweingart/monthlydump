@@ -9,11 +9,10 @@ import { auth, db, functions } from '../Firebase'
 const Preview = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const today = new Date()
+  const currentUser = auth.currentUser
   const month = today.toLocaleString('default', { month: 'long' })
-
   const navigation = useNavigation()
   const dispatch = useDispatch()
-  const userId = auth.currentUser.uuid
   const topic1 = useSelector(state => state.updateField1)
   const update1 = useSelector(state => state.update1)
   const image1 = useSelector(state => state.update1Image)
@@ -28,8 +27,8 @@ const Preview = () => {
   const image4 = useSelector(state => state.update4Image)
   const submitted = useSelector(state => state.updateSubmitted)
 
-  const email = 'nweingart12@gmail.com'
-
+  const email = currentUser.email
+  console.log(currentUser)
 
   const handleRead = () => {
     db.collection("updates").add({
@@ -65,7 +64,23 @@ const Preview = () => {
     dispatch(setUpdateSubmitted(true))
     handleRead()
     const sendEmail = functions.httpsCallable('sendEmail')
-    sendEmail({ email: 'nweingart1234@gmail.com', name: 'Ned', month: month }).then(result => {
+    sendEmail({
+      email: email,
+      name: 'Ned',
+      month: month,
+      update1Topic: topic1,
+      update1Text: update1,
+      update1Image: image1,
+      update2Topic: topic2,
+      update2Text: update2,
+      update2Image: image2,
+      update3Topic: topic3,
+      update3Text: update3,
+      update3Image: image3,
+      update4Topic: topic4,
+      update4Text: update4,
+      update4Image: image4,
+    }).then(result => {
       console.log(result.data)
     })
     navigation.navigate('Confirmation')
