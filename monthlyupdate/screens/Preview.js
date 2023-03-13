@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, SafeAreaView, Linking } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, SafeAreaView } from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -13,6 +13,7 @@ const Preview = () => {
   const month = today.toLocaleString('default', { month: 'long' })
   const navigation = useNavigation()
   const dispatch = useDispatch()
+  const name = 'Ned'
   const topic1 = useSelector(state => state.updateField1)
   const update1 = useSelector(state => state.update1)
   const image1 = useSelector(state => state.update1Image)
@@ -28,11 +29,11 @@ const Preview = () => {
   const submitted = useSelector(state => state.updateSubmitted)
 
   const email = currentUser.email
-  console.log(currentUser)
+  console.log(name)
 
-  const handleRead = () => {
+  const handleWrite = () => {
     db.collection("updates").add({
-      userId: "1",
+      email: email,
       month: month,
       update1Topic: topic1,
       update1Text: update1,
@@ -62,11 +63,11 @@ const Preview = () => {
 
   const handleConfirm = () => {
     dispatch(setUpdateSubmitted(true))
-    handleRead()
+    handleWrite()
     const sendEmail = functions.httpsCallable('sendEmail')
     sendEmail({
       email: email,
-      name: 'Ned',
+      name: name,
       month: month,
       update1Topic: topic1,
       update1Text: update1,
@@ -86,6 +87,7 @@ const Preview = () => {
     navigation.navigate('Confirmation')
   }
 
+  console.log(image1)
 
 
   const data = [
@@ -97,7 +99,7 @@ const Preview = () => {
 
   const renderImage = ({ item }) => {
       return (
-        <View key={item.id}>
+        <View style={{ width: 400 }} key={item.id}>
           <Text style={styles.topicText}>{item.topic}</Text>
           <Image source={{ uri: item.uri }} style={styles.image} />
           <Text style={styles.text}>{item.text}</Text>
@@ -105,40 +107,44 @@ const Preview = () => {
       )
   }
 
-  const renderImageTwo = ({ item }) => {
-    return (
-      <View key={item.id}>
-        <View style={{ backgroundColor: 'black', height: 145, width: 200, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Image source={{ uri: item.uri }} style={{ height: 125, width: 175, borderRadius: 2, borderColor: 'black', borderWidth: 2, }}/>
-        </View>
-      </View>
-    )
-  }
-
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => isEnabled ? setIsEnabled(false) : setIsEnabled(true)}>
-        {isEnabled ? <Text>Photoroll</Text> : <Text>Update</Text>}
+      <TouchableOpacity
+        onPress={() => isEnabled ? setIsEnabled(false) : setIsEnabled(true)}
+        style={{ marginTop: -40, marginBottom: 40, marginRight: -200 }}
+      >
+        {!isEnabled ?
+          <Text
+            style={{ color: '#ACECC2', fontWeight: 'bold' }}>See Photoroll Version
+          </Text> :
+          <Text
+            style={{ color: '#ACECC2', fontWeight: 'bold' }}>See Update Version
+          </Text>
+        }
       </TouchableOpacity>
       <View style={styles.backButtonWrapper}>
         <TouchableOpacity onPress={handleBack}>
           <Ionicons name="arrow-back-outline" size='25' style={{ color: '#ACECC2'}} />
         </TouchableOpacity>
       </View>
-      {
-        isEnabled ? <View>
-        <Text style={styles.title}>Your {month}</Text>
-        </View> : <View>
-          <Text style={styles.title}>{month} Photo roll</Text>
+        <View>
+          <Text style={styles.title}>{name}'s {month}</Text>
         </View>
-      }
-      { isEnabled ?
+      { !isEnabled ?
         <SafeAreaView style={styles.contentWrapper}>
           <FlatList data={data} renderItem={renderImage} />
-        </SafeAreaView> : <SafeAreaView style={styles.contentWrapper}>
-          <FlatList data={data} renderItem={renderImageTwo} />
-        </SafeAreaView>
+        </SafeAreaView> :
+        <View style={{ display: 'flex', flexDirection: 'column', height: 650, width: 400 }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <Image source={{ uri: image1 }} style={{ height: 275, width: 190, borderTopLeftRadius: 15 }} />
+            <Image source={{ uri: image2 }} style={{ height: 275, width: 190, borderTopRightRadius: 15 }} />
+          </View>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <Image source={{ uri: image3 }} style={{ height: 275, width: 190, borderBottomLeftRadius: 15 }}/>
+            <Image source={{ uri: image4 }} style={{ height: 275, width: 190, borderBottomRightRadius: 15 }} />
+          </View>
+        </View>
       }
         <View style={styles.nextButtonWrapper}>
           <TouchableOpacity style={styles.nextButton} onPress={handleConfirm}>

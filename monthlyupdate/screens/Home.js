@@ -2,8 +2,6 @@ import React from 'react'
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native'
 import {useNavigation} from "@react-navigation/native"
 import {auth} from "../Firebase"
-import LogoFull from '../assets/logoFull.png'
-import { useSelector } from "react-redux"
 
 
 const Home = () => {
@@ -38,10 +36,16 @@ const Home = () => {
           <Text>Log Out</Text>
         </TouchableOpacity>
       </View>
+      <View>
+        <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#ACECC2', marginTop: -150 }}>Monthly Dump</Text>
+      </View>
+      <View>
+        <Image source={require('../assets/logo.png')} style={{ height: 100, width: 100, marginTop: -75, marginBottom: 150 }}/>
+      </View>
       <View style={styles.linkWrapper}>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleUpdateClick}>
           <Text style={styles.linkButtonText}>
-            {submitted ? "View Update" : "Create Update"}
+            {submitted ? "View Last Dump" : "Create Dump"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleEmailListClick}>
@@ -49,10 +53,6 @@ const Home = () => {
             Edit Mailing List
           </Text>
         </TouchableOpacity>
-      </View>
-      <View style={styles.brandTextWrapper}>
-        <Text style={styles.brandText}>Appreciate the past,</Text>
-        <Text style={styles.brandText}>strive for the future.</Text>
       </View>
     </View>
   )
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'snow',
+    backgroundColor: '#ffffff',
   },
   logoWrapper: {
     position: 'absolute',

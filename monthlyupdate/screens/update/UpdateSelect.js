@@ -41,6 +41,18 @@ const OPTIONS = [
     label: 'Relationship',
     id: 'REL',
   },
+  {
+    label: 'Other',
+    id: 'OTH',
+  },
+  {
+    label: 'Goals',
+    id: 'GOL',
+  },
+  {
+    label: 'Quote',
+    id: 'QUO',
+  },
 ]
 
 const UpdateSelect = () => {
@@ -119,14 +131,17 @@ const UpdateSelect = () => {
         </TouchableOpacity>
       </View>
       <SafeAreaView style={styles.buttonContainer}>
-        <Text style={styles.pageTitle}>Select Topics</Text>
+        <Text style={styles.pageTitle}>Select 4 Topics</Text>
         <FlatList data={OPTIONS} renderItem={renderImage} />
       </SafeAreaView>
       <View style={styles.nextButtonWrapper}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext} disabled={disabled}>
-          <Text style={styles.nextText}>Next</Text>
-          <Ionicons name="arrow-forward-outline" size='25' color={'#ACECC2'} />
-        </TouchableOpacity>
+        {
+          !selectedItem1 || !selectedItem2 || !selectedItem3 || !selectedItem4 ? null :
+            <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+              <Text style={styles.nextText}>Next</Text>
+              <Ionicons name="arrow-forward-outline" size='25' color={'#ACECC2'} />
+            </TouchableOpacity>
+        }
       </View>
     </View>
   )
@@ -136,7 +151,7 @@ const UpdateSelect = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'snow',
+    backgroundColor: '#ffffff',
     opacity: 0.9,
   },
   backButtonWrapper: {
@@ -158,11 +173,12 @@ const styles = StyleSheet.create({
   topicButton: {
     display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'center',
     backgroundColor: '#F5F5F5',
     borderRadius: 10,
     padding: 10,
     margin: 10,
-    width: 150,
+    width: 250,
     fontFamily: 'Avenir',
   },
   topicButton1: {

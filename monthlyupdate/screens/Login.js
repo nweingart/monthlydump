@@ -2,7 +2,7 @@ import React from 'react'
 import {Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View,} from 'react-native'
 import { auth } from '../Firebase'
 import {useNavigation} from "@react-navigation/native";
-import LogoFull from "../assets/logoFull.png";
+import { signInWithEmailAndPassword } from 'firebase/auth'
 
 const Login = () => {
   const [email, setEmail] = React.useState('')
@@ -20,8 +20,7 @@ const Login = () => {
   }, [])
 
   const handleLogin = () => {
-    auth
-      .signInWithEmailAndPassword(email, password)
+    signInWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user
         console.log(`logged in with email ${user.email}`)
@@ -35,11 +34,15 @@ const Login = () => {
 
   return (
     <KeyboardAvoidingView
+      platform="ios"
       style={styles.container}
       behavior="padding"
     >
-      <View style={styles.logoWrapper}>
-        <Image source={LogoFull} />
+      <View>
+        <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#ACECC2', marginBottom: 25 }}>Monthly Dump</Text>
+      </View>
+      <View>
+        <Image source={require('../assets/logo.png')} style={{ height: 100, width: 100, marginBottom: 50 }}/>
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -67,7 +70,7 @@ const Login = () => {
       </View>
       <View style={styles.register}>
         <Text style={styles.bottomText} onPress={handleRegister}>
-          New to Update? Tap here to sign up
+          New to Monthly Dump? Tap here to sign up
         </Text>
       </View>
     </KeyboardAvoidingView>
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ACECC2',
+    backgroundColor: '#ffffff',
   },
   logoWrapper: {
     position: 'absolute',
@@ -105,11 +108,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: '#ACECC2',
     padding: 15,
     borderRadius: 10,
-    borderColor: 'gray',
-    borderWidth: 1,
   },
   buttonText: {
     color: 'black',

@@ -13,11 +13,11 @@ const Confirmation = () => {
   return (
     <View style={styles.container}>
       <View style={styles.backButtonWrapper}>
-        <Text>Confirmed!</Text>
+        <Text style={styles.text}>Confirmed!</Text>
       </View>
       <View>
-        <TouchableOpacity onPress={handleReturn}>
-          <Text>Return to Home</Text>
+        <TouchableOpacity style={styles.button} onPress={handleReturn}>
+          <Text style={styles.buttonText}>Return Home</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -29,9 +29,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ACECC2',
+    backgroundColor: 'snow',
     padding: 25,
     paddingTop: 100,
+  },
+  text: {
+    fontSize: 30,
+    marginBottom: '5%',
+    color: '#ACECC2',
+  },
+  button: {
+    marginTop: '5%',
+    marginBottom: '5%',
+    backgroundColor: '#ACECC2',
+    height: 50,
+    padding: 10,
+    borderRadius: 8,
+  },
+  buttonText: {
+    padding: 2.5,
+    fontSize: 18,
+    color: 'snow',
+    textAlign: 'center',
+    alignItems: 'center',
   },
 })
 

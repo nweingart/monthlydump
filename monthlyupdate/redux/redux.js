@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware} from "redux";
+import { createStore, applyMiddleware} from 'redux'
 import thunkMiddleWare from 'redux-thunk'
 
 const initialState = {
@@ -31,6 +31,13 @@ const reducer = (state = initialState, action) => {
 
 const store = createStore(reducer, applyMiddleware(thunkMiddleWare))
 export { store }
+
+const setFirstName = (firstName) => {
+  return {
+    type: 'firstName',
+    value: firstName
+  }
+}
 
 const setMailingList = (mailingList) => {
   return {
@@ -124,27 +131,6 @@ const setUpdate4Image = (update4Image) => {
   }
 }
 
-const setUpdateField5 = (updateField5) => {
-  return {
-    type: 'updateField5',
-    value: updateField5
-  }
-}
-
-const setUpdate5 = (update5) => {
-  return {
-    type: 'update5',
-    value: update5
-  }
-}
-
-const setUpdate5Image = (update5Image) => {
-  return {
-    type: 'update5Image',
-    value: update5Image
-  }
-}
-
 const setUpdateSubmitted = (updateSubmitted) => {
   return {
     type: 'updateSubmitted',
@@ -153,6 +139,7 @@ const setUpdateSubmitted = (updateSubmitted) => {
 }
 
 export {
+  setFirstName,
   setMailingList,
   setUpdateField1,
   setUpdate1,
@@ -166,8 +153,5 @@ export {
   setUpdate4,
   setUpdateField4,
   setUpdate4Image,
-  setUpdate5,
-  setUpdateField5,
-  setUpdate5Image,
   setUpdateSubmitted,
 }

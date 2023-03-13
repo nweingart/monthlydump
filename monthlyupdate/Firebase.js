@@ -1,7 +1,9 @@
 // Import the functions you need from the SDKs you need
-import firebase from "firebase"
-import "firebase/storage"
-import "firebase/functions"
+import { initializeApp } from "firebase/app"
+import { getAuth } from "firebase/auth"
+import { getFirestore, collection, getDocs } from "firebase/firestore"
+import { getFunctions } from 'firebase/functions'
+import { getStorage } from 'firebase/storage'
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -18,21 +20,28 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let app
-if (firebase.apps.length === 0) {
-  app = firebase.initializeApp(firebaseConfig)
-} else {
-  app = firebase.app()
-}
 
-const auth = firebase.auth()
-const db = firebase.firestore()
+const app = initializeApp(firebaseConfig)
+const auth = getAuth(app)
+const db = getFirestore(app)
 
-const functions = firebase.functions()
+const usersRef = collection(db, "users")
+const updatesRef = collection(db, "updates")
+const mailingListsRef = collection(db, "mailingLists")
+const functions = getFunctions(app)
+const storage = getStorage(app)
 
-console.log(firebase.storage())
+getDocs(usersRef)
+  .then((querySnapshot) => {
+  let users = []
+  querySnapshot.forEach((doc) => {
+    users.push( { ...doc.data(), id: doc.id} )
+  })
+  console.log(users)
+})
+  .catch(err => {
+  console.log(err)
+  })
 
-const storage = firebase.storage()
 
-
-export { auth, db, storage, functions }
+export { auth, db, storage, functions, usersRef, updatesRef, mailingListsRef }

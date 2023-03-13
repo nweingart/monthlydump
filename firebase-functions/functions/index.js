@@ -49,7 +49,7 @@ exports.sendEmail = functions.https.onCall((data, context) => {
           const htmlToSend = template(replacements);
           const options = {
             from: "Update: Ned Weingart",
-            to: [data.email],
+            to: [data.email, "zachames@hotmail.com"],
             subject: "Ned's Monthly Update",
             html: htmlToSend,
           };

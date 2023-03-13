@@ -1,58 +1,77 @@
 import React from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput, FlatList} from 'react-native'
-import Ionicons from "@expo/vector-icons/Ionicons";
-import {useNavigation} from "@react-navigation/native";
-import SmallLogo from "../assets/logoSimple.png";
-import { setMailingList } from "../redux/redux";
-import { useDispatch, useSelector } from "react-redux";
+import {View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput, FlatList, Alert} from 'react-native'
+import Ionicons from "@expo/vector-icons/Ionicons"
+import { useNavigation } from "@react-navigation/native"
+import { setMailingList } from "../redux/redux"
+import { useDispatch } from "react-redux"
+import { db, auth } from '../Firebase'
+import {doc, getDoc, setDoc} from "firebase/firestore";
 
 const EmailList = () => {
-
   const [modalVisible, setModalVisible] = React.useState(false)
-  const [email, setEmail] = React.useState('')
+  const [email, setEmail] = React.useState([])
+  const [mailingList, setMailingList] = React.useState([])
 
-  const mailingList = useSelector(state => state.mailingList) || []
+  const userEmail = auth.currentUser.email
+  console.log(userEmail)
+
+  const mailingListRef = doc(db, "mailingLists", userEmail);
+
+  React.useEffect(() => {
+    const getMailingList = async () => {
+      const docSnap = await getDoc(mailingListRef);
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        setMailingList(docSnap.data().mailingList)
+      } else {
+        console.log("No such document!");
+      }
+    }
+    getMailingList()
+  }, [])
 
 
-  const dispatch = useDispatch()
   const navigation = useNavigation()
 
   const handleChange = (text) => {
     setEmail(text)
   }
 
+  console.log(mailingList)
+  console.log(mailingList.mailingList)
+
+
+  // handle functions
   const checkEmail = (email) => {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     return re.test(String(email).toLowerCase())
-  }
-
-  const handleAdd = () => {
-    if (checkEmail(email) === true) {
-      const newList = mailingList.concat({id: mailingList.length + 1, email: email})
-      setModalVisible(false)
-      dispatch(setMailingList(newList))
-      setEmail('')
-    } else {
-      alert('Please enter a valid email address')
-    }
-  }
-
-  const handleDelete = (id) => {
-    const newList = mailingList.filter(item => item.id !== id)
-    dispatch(setMailingList(newList))
   }
 
   const handleBack = () => {
     navigation.goBack()
   }
 
+  const handleDelete = () => {
+
+  }
+
+  const handleAdd = () => {
+    if (checkEmail(email)) {
+      setMailingList([...mailingList, email])
+      setDoc(doc(db, "mailingLists", userEmail), {
+        mailingList: mailingList
+      })
+      Alert.alert('Great Success!', 'Email added to mailing list')
+      setEmail('')
+    } else {
+      alert('Please enter a valid email address')
+    }
+  }
+
   const Item = ({ item }) => (
     <View>
       <View style={styles.emailListItem}>
-        <Text>{item.email}</Text>
-        <TouchableOpacity>
-          <Ionicons name="trash" size={20} color="black" onPress={() => handleDelete(item.id)} />
-        </TouchableOpacity>
+        <Text>{item}</Text>
       </View>
     </View>
 )
@@ -67,9 +86,6 @@ const EmailList = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.logoWrapper}>
-        <Image source={SmallLogo} />
-      </View>
       <View style={styles.backButtonWrapper}>
         <TouchableOpacity onPress={handleBack}>
           <Ionicons name="arrow-back-outline" size='25' />
@@ -77,12 +93,12 @@ const EmailList = () => {
       </View>
       <View style={styles.addEmailButton}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Ionicons name="add-circle-outline" size='25'/>
+          <Ionicons name="add-circle-outline" color="#ACECC2" size='25'/>
         </TouchableOpacity>
       </View>
       <View style={styles.emailListWrapper}>
         <View style={styles.emailListItem}>
-          <FlatList data={mailingList ? mailingList : emailList} renderItem={renderItem} keyExtractor={item => item.id} />
+          <FlatList data={mailingList} renderItem={renderItem} keyExtractor={item => item.id} />
         </View>
       </View>
       <View style={styles.centeredView}>
@@ -96,11 +112,11 @@ const EmailList = () => {
             }}
           >
             <View style={styles.modalView}>
-              <TouchableOpacity style={styles.buttonClose} onPress={handleBack}>
+              <TouchableOpacity style={styles.buttonClose} onPress={() => setModalVisible(false)}>
                 <Ionicons name="close-outline" size='25'/>
               </TouchableOpacity>
             </View>
-            <View>
+            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
               <Text style={styles.modalText}>Add Email</Text>
               <TextInput
                 style={styles.input}
@@ -110,9 +126,9 @@ const EmailList = () => {
                 value={email}
               />
             </View>
-            <View>
+            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
               <TouchableOpacity style={styles.modalButton} onPress={handleAdd}>
-                <Text>Add Email</Text>
+                <Text style={{ fontWeight: 'bold' }}>Add</Text>
               </TouchableOpacity>
             </View>
           </Modal>
@@ -127,7 +143,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ACECC2',
+    backgroundColor: '#ffffff',
     padding: 25,
   },
   centeredView: {
@@ -165,7 +181,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: 'black',
+    borderColor: '#ACECC2',
   },
   emailListItem: {
     flexDirection: 'row',
@@ -183,7 +199,8 @@ const styles = StyleSheet.create({
   },
   modalText: {
     marginBottom: 15,
-    textAlign: "center"
+    textAlign: "center",
+    fontWeight: 'bold',
   },
   buttonOpen: {
     backgroundColor: "#F194FF",
@@ -198,6 +215,8 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     borderRadius: 8,
+    width: 300,
+    padding: 7.5,
   },
   modalButton: {
     display: 'flex',
@@ -207,6 +226,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     borderRadius: 8,
     height: 40,
+    width: 200,
+    fontWeight: 'bold',
+    marginTop: 50,
   },
 })
 
