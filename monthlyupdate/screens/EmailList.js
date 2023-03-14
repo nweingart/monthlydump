@@ -1,9 +1,7 @@
 import React from 'react'
-import {View, Text, StyleSheet, TouchableOpacity, Image, Modal, TextInput, FlatList, Alert} from 'react-native'
+import {View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert} from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons"
 import { useNavigation } from "@react-navigation/native"
-import { setMailingList } from "../redux/redux"
-import { useDispatch } from "react-redux"
 import { db, auth } from '../Firebase'
 import {doc, getDoc, setDoc} from "firebase/firestore";
 
@@ -16,6 +14,40 @@ const EmailList = () => {
   console.log(userEmail)
 
   const mailingListRef = doc(db, "mailingLists", userEmail);
+
+  const handleAdd = () => {
+    if (checkEmail(email)) {
+      setMailingList(mailingList.concat(email))
+      setDoc(mailingListRef, { mailingList: mailingList.concat(email) }, { merge: true })
+        .then(() => {
+          Alert.alert('Great Success!', 'Email added to mailing list')
+          setEmail('')
+          console.log("Document successfully updated!");
+        })
+        .catch((error) => {
+          console.error("Error updating document: ", error);
+        })
+    } else {
+      Alert.alert(
+        "Invalid Email",
+        "Please enter a valid email address",
+      )
+    }
+  }
+
+  const handleDelete = (email) => {
+    const newMailingList = mailingList.filter((item) => item !== email)
+    setMailingList(newMailingList)
+    setDoc(mailingListRef, { mailingList: newMailingList }, { merge: true })
+      .then(() => {
+        Alert.alert('Great Success!', 'Email removed from mailing list')
+        setEmail('')
+        console.log("Document successfully updated!");
+      })
+      .catch((error) => {
+        console.error("Error updating document: ", error);
+      })
+  }
 
   React.useEffect(() => {
     const getMailingList = async () => {
@@ -37,9 +69,6 @@ const EmailList = () => {
     setEmail(text)
   }
 
-  console.log(mailingList)
-  console.log(mailingList.mailingList)
-
 
   // handle functions
   const checkEmail = (email) => {
@@ -51,27 +80,13 @@ const EmailList = () => {
     navigation.goBack()
   }
 
-  const handleDelete = () => {
-
-  }
-
-  const handleAdd = () => {
-    if (checkEmail(email)) {
-      setMailingList([...mailingList, email])
-      setDoc(doc(db, "mailingLists", userEmail), {
-        mailingList: mailingList
-      })
-      Alert.alert('Great Success!', 'Email added to mailing list')
-      setEmail('')
-    } else {
-      alert('Please enter a valid email address')
-    }
-  }
-
   const Item = ({ item }) => (
     <View>
       <View style={styles.emailListItem}>
         <Text>{item}</Text>
+        <TouchableOpacity onPress={() => handleDelete(item)}>
+          <Ionicons name="trash-outline" size='20' color={'#ACECC2'}/>
+        </TouchableOpacity>
       </View>
     </View>
 )
