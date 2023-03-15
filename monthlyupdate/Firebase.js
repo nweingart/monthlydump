@@ -31,17 +31,5 @@ const mailingListsRef = collection(db, "mailingLists")
 const functions = getFunctions(app)
 const storage = getStorage(app)
 
-getDocs(usersRef)
-  .then((querySnapshot) => {
-  let users = []
-  querySnapshot.forEach((doc) => {
-    users.push( { ...doc.data(), id: doc.id} )
-  })
-  console.log(users)
-})
-  .catch(err => {
-  console.log(err)
-  })
-
 
 export { auth, db, storage, functions, usersRef, updatesRef, mailingListsRef }

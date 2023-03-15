@@ -4,12 +4,14 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { setUpdateSubmitted } from "../redux/redux";
-import { auth, db, functions } from '../Firebase'
+import { auth } from '../Firebase'
+import { httpsCallable, getFunctions } from 'firebase/functions'
 
 const Preview = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const today = new Date()
   const currentUser = auth.currentUser
+  const currentPeriod = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).split(" ").join("")
   const month = today.toLocaleString('default', { month: 'long' })
   const navigation = useNavigation()
   const dispatch = useDispatch()
@@ -29,42 +31,18 @@ const Preview = () => {
   const submitted = useSelector(state => state.updateSubmitted)
 
   const email = currentUser.email
-  console.log(name)
-
-  const handleWrite = () => {
-    db.collection("updates").add({
-      email: email,
-      month: month,
-      update1Topic: topic1,
-      update1Text: update1,
-      update1Image: image1,
-      update2Topic: topic2,
-      update2Text: update2,
-      update2Image: image2,
-      update3Topic: topic3,
-      update3Text: update3,
-      update3Image: image3,
-      update4Topic: topic4,
-      update4Text: update4,
-      update4Image: image4,
-    })
-      .then((docRef) => {
-        console.log("Document written with ID: ", docRef.id);
-      })
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-      });
-  }
 
   const handleBack = () => {
-    submitted ? navigation.navigate('Home') : navigation.goBack()
+    submitted ? navigation.navigate('UpdateField4') : navigation.goBack()
   }
+
+  const functions = getFunctions()
+
 
 
   const handleConfirm = () => {
     dispatch(setUpdateSubmitted(true))
-    handleWrite()
-    const sendEmail = functions.httpsCallable('sendEmail')
+    const sendEmail = httpsCallable(functions, 'sendEmail');
     sendEmail({
       email: email,
       name: name,
@@ -86,9 +64,6 @@ const Preview = () => {
     })
     navigation.navigate('Confirmation')
   }
-
-  console.log(image1)
-
 
   const data = [
     { id: 1, uri: image1, text: update1, topic: topic1 },

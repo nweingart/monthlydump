@@ -9,6 +9,8 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case "mailingList": return {...state, mailingList: action.value}
+    case "firstName": return {...state, firstName: action.value}
+    case "lastName": return {...state, lastName: action.value}
     case "updateField1": return { ...state, updateField1: action.value}
     case "update1": return { ...state, update1: action.value}
     case "update1Image": return { ...state, update1Image: action.value}
@@ -21,9 +23,6 @@ const reducer = (state = initialState, action) => {
     case "updateField4": return { ...state, updateField4: action.value}
     case "update4": return { ...state, update4: action.value}
     case "update4Image": return { ...state, update4Image: action.value}
-    case "updateField5": return { ...state, updateField5: action.value}
-    case "update5": return { ...state, update5: action.value}
-    case "update5Image": return { ...state, update5Image: action.value}
     case "updateSubmitted": return { ...state, updateSubmitted: action.value}
     default: return state
   }
@@ -39,10 +38,10 @@ const setFirstName = (firstName) => {
   }
 }
 
-const setMailingList = (mailingList) => {
+const setLastName = (lastName) => {
   return {
-    type: 'mailingList',
-    value: mailingList
+    type: 'lastName',
+    value: lastName
   }
 }
 
@@ -140,7 +139,7 @@ const setUpdateSubmitted = (updateSubmitted) => {
 
 export {
   setFirstName,
-  setMailingList,
+  setLastName,
   setUpdateField1,
   setUpdate1,
   setUpdate1Image,

@@ -15,40 +15,73 @@ import {useNavigation} from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { setUpdate2, setUpdate2Image } from "../../redux/redux";
-import { storage } from '../../Firebase'
+import {auth, storage} from '../../Firebase'
+import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
 
 const UpdateField2 = () => {
   const [update, setUpdate] = React.useState('')
-  const [image, setImage] = React.useState(null);
-  const [filename, setFilename] = React.useState('')
+  const [image, setImage] = React.useState('')
+  const [uploading, setUploading] = React.useState(false);
 
-  const submitPhoto = async () => {
-    const response = await fetch(image)
-    const blob = await response.blob()
-    const filename = image.substring(image.lastIndexOf('/') + 1)
-
-    try {
-      await storage.ref().child(filename).put(blob)
-      setFilename(filename)
-    } catch(err) {
-      console.log(err)
-    }
-  }
-
+  const userEmail = auth.currentUser.email
+  const currentPeriod = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).split(" ").join("")
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.2,
     });
 
+    console.log({ pickerResult })
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
+    // once the image is picked, we call the function to handle the image
+    handlePickedImage(pickerResult)
+
   };
+
+  // the handle function calls the upload function
+  const handlePickedImage = async (pickerResult) => {
+    try {
+      setUploading(true)
+
+      if (!pickerResult.cancelled) {
+        const uploadUrl = await uploadImageAsync(pickerResult.uri)
+        setImage(uploadUrl)
+      }
+    } catch (e) {
+      console.log(e)
+      alert('Upload failed, sorry :(')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // the upload function!
+  const uploadImageAsync = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function() {
+        resolve(xhr.response);
+      }
+      xhr.onerror = function(e) {
+        console.log(e);
+        reject(new TypeError('Network request failed'));
+      }
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+      xhr.send(null);
+    })
+
+    const storageRef = ref(storage, `${userEmail}/${currentPeriod}/update2.png`);
+    const result = await uploadBytes(storageRef, blob)
+    console.log(result)
+
+    blob.close()
+
+    return await getDownloadURL(storageRef)
+  }
 
   const clearImage =() => {
     setImage(null)
@@ -64,8 +97,6 @@ const UpdateField2 = () => {
   const navigation = useNavigation()
 
   const handleBack = () => {
-    dispatch(setUpdate2(update))
-    dispatch(setUpdate2Image(image))
     navigation.navigate('UpdateField1')
   }
 
@@ -74,15 +105,9 @@ const UpdateField2 = () => {
   }
 
   const handleNext = () => {
-    if (disabled) {
-      alert('You may only use 500 characters per update.')
-    } else {
-      submitPhoto()
-        .then(() => console.log('photo submitted!'))
-      dispatch(setUpdate2(update))
-      dispatch(setUpdate2Image(image))
-      navigation.navigate('UpdateField3')
-    }
+    dispatch(setUpdate2(update))
+    dispatch(setUpdate2Image(image))
+    navigation.navigate('UpdateField3')
   }
 
   React.useEffect(() => {
