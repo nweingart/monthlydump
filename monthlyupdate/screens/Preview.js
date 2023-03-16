@@ -28,17 +28,14 @@ const Preview = () => {
   const topic4 = useSelector(state => state.updateField4)
   const update4 = useSelector(state => state.update4)
   const image4 = useSelector(state => state.update4Image)
-  const submitted = useSelector(state => state.updateSubmitted)
 
   const email = currentUser.email
 
   const handleBack = () => {
-    submitted ? navigation.navigate('UpdateField4') : navigation.goBack()
+    navigation.navigate('UpdateField4')
   }
 
   const functions = getFunctions()
-
-
 
   const handleConfirm = () => {
     dispatch(setUpdateSubmitted(true))

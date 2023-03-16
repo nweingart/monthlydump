@@ -23,6 +23,9 @@ const reducer = (state = initialState, action) => {
     case "updateField4": return { ...state, updateField4: action.value}
     case "update4": return { ...state, update4: action.value}
     case "update4Image": return { ...state, update4Image: action.value}
+    case "updateGoal1": return { ...state, updateGoal1: action.value}
+    case "updateGoal2": return { ...state, updateGoal2: action.value}
+    case "updateGoal3": return { ...state, updateGoal3: action.value}
     case "updateSubmitted": return { ...state, updateSubmitted: action.value}
     default: return state
   }
@@ -137,6 +140,27 @@ const setUpdateSubmitted = (updateSubmitted) => {
   }
 }
 
+const setUpdateGoal1 = (updateGoal1) => {
+  return {
+    type: 'updateGoal1',
+    value: updateGoal1
+  }
+}
+
+const setUpdateGoal2 = (updateGoal2) => {
+  return {
+    type: 'updateGoal2',
+    value: updateGoal2
+  }
+}
+
+const setUpdateGoal3 = (updateGoal3) => {
+  return {
+    type: 'updateGoal3',
+    value: updateGoal3
+  }
+}
+
 export {
   setFirstName,
   setLastName,
@@ -152,5 +176,8 @@ export {
   setUpdate4,
   setUpdateField4,
   setUpdate4Image,
+  setUpdateGoal1,
+  setUpdateGoal2,
+  setUpdateGoal3,
   setUpdateSubmitted,
 }

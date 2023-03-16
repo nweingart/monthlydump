@@ -15,6 +15,7 @@ import UpdateField1 from "./screens/update/UpdateField1"
 import UpdateField2 from "./screens/update/UpdateField2"
 import UpdateField3 from "./screens/update/UpdateField3"
 import UpdateField4 from "./screens/update/UpdateField4"
+import Goals from "./screens/update/Goals"
 import Preview from "./screens/Preview"
 import Confirmation from "./screens/Confirmation"
 
@@ -34,6 +35,7 @@ const App = () => {
           <Stack.Screen options={{ headerShown: false }} name="UpdateField2" component={UpdateField2} />
           <Stack.Screen options={{ headerShown: false }} name="UpdateField3" component={UpdateField3} />
           <Stack.Screen options={{ headerShown: false }} name="UpdateField4" component={UpdateField4} />
+          <Stack.Screen options={{ headerShown: false }} name="Goals" component={Goals} />
           <Stack.Screen options={{ headerShown: false }} name="Preview" component={Preview} />
           <Stack.Screen options={{ headerShown: false }} name="Confirmation" component={Confirmation} />
         </Stack.Navigator>
