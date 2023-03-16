@@ -45,14 +45,6 @@ const OPTIONS = [
     label: 'Other',
     id: 'OTH',
   },
-  {
-    label: 'Goals',
-    id: 'GOL',
-  },
-  {
-    label: 'Quote',
-    id: 'QUO',
-  },
 ]
 
 const UpdateSelect = () => {
