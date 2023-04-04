@@ -1,12 +1,13 @@
 import React from 'react'
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native'
-import {useNavigation} from "@react-navigation/native";
-import {auth} from "../Firebase";
-import LogoFull from '../assets/logoFull.png'
+import {useNavigation} from "@react-navigation/native"
+import {auth} from "../Firebase"
 
 
 const Home = () => {
   const navigation = useNavigation()
+  const submitted = false
+  const user = auth.currentUser
 
   const handleSignOut = () => {
     auth.signOut()
@@ -16,12 +17,16 @@ const Home = () => {
       .catch(error => alert(error.message))
   }
 
+  if (!user) {
+    handleSignOut()
+  }
+
   const handleEmailListClick = () => {
     navigation.navigate("EmailList")
   }
 
   const handleUpdateClick = () => {
-    navigation.navigate("UpdateSelect")
+    submitted === true ? navigation.navigate("Preview") : navigation.navigate("UpdateSelect")
   }
 
   return (
@@ -31,24 +36,23 @@ const Home = () => {
           <Text>Log Out</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.logoWrapper}>
-        <Image source={LogoFull} />
+      <View>
+        <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#ACECC2', marginTop: -150 }}>Monthly Dump</Text>
+      </View>
+      <View>
+        <Image source={require('../assets/logo.png')} style={{ height: 100, width: 100, marginTop: -75, marginBottom: 150 }}/>
       </View>
       <View style={styles.linkWrapper}>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleUpdateClick}>
           <Text style={styles.linkButtonText}>
-            Create Update
+            {submitted ? "View Last Dump" : "Create Dump"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleEmailListClick}>
           <Text style={styles.linkButtonText}>
-            View Email List
+            Edit Mailing List
           </Text>
         </TouchableOpacity>
-      </View>
-      <View style={styles.brandTextWrapper}>
-        <Text style={styles.brandText}>Appreciate the past,</Text>
-        <Text style={styles.brandText}>strive for the future.</Text>
       </View>
     </View>
   )
@@ -59,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ACECC2',
+    backgroundColor: '#ffffff',
   },
   logoWrapper: {
     position: 'absolute',
@@ -79,7 +83,7 @@ const styles = StyleSheet.create({
   linkButtonWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#ACECC2',
     borderRadius: 10,
     height: 50,
     width: 300,
