@@ -43,7 +43,7 @@ const Preview = () => {
     sendEmail({
       email: email,
       name: name,
-      month: month,
+      month: 'March',
       update1Topic: topic1,
       update1Text: update1,
       update1Image: image1,
@@ -101,7 +101,7 @@ const Preview = () => {
         </TouchableOpacity>
       </View>
         <View>
-          <Text style={styles.title}>{name}'s {month}</Text>
+          <Text style={styles.title}>{name}'s March</Text>
         </View>
       { !isEnabled ?
         <SafeAreaView style={styles.contentWrapper}>

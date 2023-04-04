@@ -4,10 +4,10 @@ const handlebars = require("handlebars");
 const fs = require("fs");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  service: "hotmail",
   auth: {
-    user: "nweingart12@gmail.com",
-    pass: "fxplnvthohjerlwr",
+    user: "monthlydump@hotmail.com",
+    pass: "Shaker12!",
   },
 });
 
@@ -48,9 +48,11 @@ exports.sendEmail = functions.https.onCall((data, context) => {
           };
           const htmlToSend = template(replacements);
           const options = {
-            from: "Update: Ned Weingart",
-            to: [data.email, "zachames@hotmail.com"],
-            subject: "Ned's Monthly Update",
+            from: "monthlydump@hotmail.com",
+            to: data.email,
+            cc: data.email,
+            bcc: data.mailingList,
+            subject: `${data.name} has sent you their monthly update!`,
             html: htmlToSend,
           };
           transporter.sendMail(options, (err, info) => {
