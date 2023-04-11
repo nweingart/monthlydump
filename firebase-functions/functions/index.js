@@ -51,7 +51,7 @@ exports.sendEmail = functions.https.onCall((data, context) => {
             from: "monthlydump@hotmail.com",
             to: data.email,
             cc: data.email,
-            bcc: data.mailingList,
+            bcc: [data.mailingList],
             subject: `${data.name} has sent you their monthly update!`,
             html: htmlToSend,
           };

@@ -4,18 +4,21 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { setUpdateSubmitted } from "../redux/redux";
-import { auth } from '../Firebase'
+import {auth, db, usersRef} from '../Firebase'
 import { httpsCallable, getFunctions } from 'firebase/functions'
+import {doc, getDoc} from "firebase/firestore";
 
 const Preview = () => {
   const [isEnabled, setIsEnabled] = useState(false);
+  const [name, setName] = useState('')
+  const [mailingList, setMailingList] = useState([])
+  const userEmail = auth.currentUser.email
   const today = new Date()
   const currentUser = auth.currentUser
   const currentPeriod = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).split(" ").join("")
   const month = today.toLocaleString('default', { month: 'long' })
   const navigation = useNavigation()
   const dispatch = useDispatch()
-  const name = 'Ned'
   const topic1 = useSelector(state => state.updateField1)
   const update1 = useSelector(state => state.update1)
   const image1 = useSelector(state => state.update1Image)
@@ -31,11 +34,46 @@ const Preview = () => {
 
   const email = currentUser.email
 
+  const userRef = doc(db, "users", userEmail);
+  const mailingListRef = doc(db, "mailingLists", userEmail);
+  console.log(userRef)
+
   const handleBack = () => {
     navigation.navigate('UpdateField4')
   }
 
   const functions = getFunctions()
+
+  React.useEffect(() => {
+    const getMailingList = async () => {
+      const docSnap = await getDoc(mailingListRef);
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        setMailingList(docSnap.data().mailingList)
+      } else {
+        console.log("No such document!");
+      }
+    }
+    getMailingList()
+  }, [])
+
+
+  React.useEffect(() => {
+    const getUserName = async () => {
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        setName(docSnap.data().firstName)
+      } else {
+        console.log("No such document!");
+      }
+    }
+    getUserName()
+  }, [])
+
+
+  console.log(mailingList)
+
 
   const handleConfirm = () => {
     dispatch(setUpdateSubmitted(true))
@@ -44,6 +82,7 @@ const Preview = () => {
       email: email,
       name: name,
       month: 'March',
+      mailingList: mailingList,
       update1Topic: topic1,
       update1Text: update1,
       update1Image: image1,
@@ -71,7 +110,7 @@ const Preview = () => {
 
   const renderImage = ({ item }) => {
       return (
-        <View style={{ width: 400 }} key={item.id}>
+        <View style={{ width: '95%' }} key={item.id}>
           <Text style={styles.topicText}>{item.topic}</Text>
           <Image source={{ uri: item.uri }} style={styles.image} />
           <Text style={styles.text}>{item.text}</Text>
@@ -109,12 +148,12 @@ const Preview = () => {
         </SafeAreaView> :
         <View style={{ display: 'flex', flexDirection: 'column', height: 650, width: 400 }}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            <Image source={{ uri: image1 }} style={{ height: 275, width: 190, borderTopLeftRadius: 15 }} />
-            <Image source={{ uri: image2 }} style={{ height: 275, width: 190, borderTopRightRadius: 15 }} />
+            <Image source={{ uri: image1 }} style={{ height: 325, width: 180, borderTopLeftRadius: 15 }} />
+            <Image source={{ uri: image2 }} style={{ height: 325, width: 180, borderTopRightRadius: 15 }} />
           </View>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            <Image source={{ uri: image3 }} style={{ height: 275, width: 190, borderBottomLeftRadius: 15 }}/>
-            <Image source={{ uri: image4 }} style={{ height: 275, width: 190, borderBottomRightRadius: 15 }} />
+            <Image source={{ uri: image3 }} style={{ height: 325, width: 180, borderBottomLeftRadius: 15 }}/>
+            <Image source={{ uri: image4 }} style={{ height: 325, width: 180, borderBottomRightRadius: 15 }} />
           </View>
         </View>
       }
@@ -149,7 +188,7 @@ const styles = StyleSheet.create({
     color: '#ACECC2',
   },
   image: {
-    height: 200,
+    height: 300,
     width: '100%',
     borderRadius: 8,
     marginBottom: '5%',

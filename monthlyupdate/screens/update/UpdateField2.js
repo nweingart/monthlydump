@@ -6,25 +6,43 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Keyboard, TouchableWithoutFeedback,
+  Keyboard,
+  Modal,
+  Alert
 } from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useNavigation} from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
-import { setUpdate2, setUpdate2Image } from "../../redux/redux";
-import {auth, storage} from '../../Firebase'
-import {getDownloadURL, ref, uploadBytes} from "firebase/storage";
+import {setUpdate2, setUpdate2Image} from "../../redux/redux";
+import { storage, auth } from '../../Firebase'
+import { ref, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage'
+import {manipulateAsync, SaveFormat} from "expo-image-manipulator";
 
 const UpdateField2 = () => {
   const [update, setUpdate] = React.useState('')
-  const [image, setImage] = React.useState('')
+  const [modalVisible, setModalVisible] = React.useState(false)
+  const [image, setImage] = React.useState('');
   const [uploading, setUploading] = React.useState(false);
 
   const userEmail = auth.currentUser.email
   const currentPeriod = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).split(" ").join("")
+
+
+  // base function for picking the image
+  const handleModalOpen = () => {
+    setModalVisible(true)
+  }
+
+  const handleModalClose = () => {
+    setModalVisible(false)
+  }
+
+  React.useEffect(() => {
+    console.log(image)
+  }, [image])
+
+  // the handle function calls the upload function
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
@@ -41,7 +59,7 @@ const UpdateField2 = () => {
 
   };
 
-  // the handle function calls the upload function
+// the handle function calls the upload function
   const handlePickedImage = async (pickerResult) => {
     try {
       setUploading(true)
@@ -58,7 +76,7 @@ const UpdateField2 = () => {
     }
   }
 
-  // the upload function!
+// the upload function!
   const uploadImageAsync = async (uri) => {
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -83,20 +101,17 @@ const UpdateField2 = () => {
     return await getDownloadURL(storageRef)
   }
 
-  const clearImage =() => {
-    setImage(null)
-  }
 
+
+  const disabled = !update && !image
   const dispatch = useDispatch()
   const updateField2 = useSelector(state => state.updateField2)
-
-  const characterCount = 280 - update.length
-
-  const disabled = characterCount > 280
+  console.log(updateField2)
 
   const navigation = useNavigation()
 
   const handleBack = () => {
+    console.log('back button pressed')
     navigation.navigate('UpdateField1')
   }
 
@@ -105,67 +120,146 @@ const UpdateField2 = () => {
   }
 
   const handleNext = () => {
-    dispatch(setUpdate2(update))
-    dispatch(setUpdate2Image(image))
-    navigation.navigate('UpdateField3')
+    if (disabled) {
+      return Alert.alert('Whoops!', 'Please add an update or image to continue', [{text: 'OK'}])
+    } else {
+      dispatch(setUpdate2(update))
+      dispatch(setUpdate2Image(image))
+      navigation.navigate('UpdateField3')
+    }
   }
 
-  React.useEffect(() => {
-  }, [characterCount])
+  const characterCount = 280 - update.length
 
+  const modalComponent = () => {
+    return (
+      <View style={styles.centeredView}>
+        <View>
+          <Modal
+            animationType="slide"
+            presentationStyle="formSheet"
+            visible={modalVisible}
+          >
+            <View style={styles.modalView}>
+              <TouchableOpacity style={styles.buttonClose} onPress={handleModalClose}>
+                <Ionicons name="close-outline" size='25'/>
+              </TouchableOpacity>
+            </View>
+            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={styles.modalText}>Add Update</Text>
+              <TextInput
+                style={styles.textBox}
+                autoCapitalize="sentences"
+                textContentType={'emailAddress'}
+                onChangeText={text => setUpdate(text)}
+                value={update}
+                multiline={true}
+              />
+            </View>
+            <View style={{ position: 'absolute', right: '8%', top: '7.5%'}}>
+              <Text style={ characterCount < 25 ? styles.characterCount2 : styles.characterCount}>{characterCount}</Text>
+            </View>
+            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <TouchableOpacity style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 20, backgroundColor: '#ACECC2', height: 30, width: 100, borderRadius: 8 }} onPress={handleModalClose}>
+                <Text style={{ fontWeight: 'bold', color: 'black', }}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        </View>
+      </View>
+    )
+  }
+  const promptBox = (icon, type) => {
+    return (
+      <TouchableOpacity onPress={type === 'Update' ? handleModalOpen : pickImage}>
+        <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200, width: 200, backgroundColor: '#ACECC2', borderRadius: 5 }}>
+          <Text style={{fontWeight: 'bold', color: 'black'}}>Click to add {type}</Text>
+          <Ionicons name={icon} size='100' color={'black'} />
+        </View>
+      </TouchableOpacity>
+    )
+  }
+  const baseComponentWithUpdate = () => {
+    return (
+      <View>
+        <View style={{...styles.textBoxWrapper, marginTop: 100}}>
+          <View
+            style={styles.textBox}
+          >
+            <Text>{update}</Text>
+          </View>
+          <TouchableOpacity style={{ marginLeft: 300, marginTop: -35}} onPress={() => setModalVisible(true)}>
+            <Text style={{ fontWeight: 'bold', color: '#ACECC2' }}>Edit</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
 
+  const baseComponentWithoutUpdate = () => {
+    return (
+      <View style={{...styles.textBoxWrapper, marginBottom: 50}}>
+        { promptBox('document-text-outline', 'Update')}
+      </View>
+    )
+  }
+
+  const baseComponentWithoutImage = () => {
+    return (
+      <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        { promptBox('image-outline', 'Image') }
+      </View>
+    )
+  }
+
+  const baseComponentWithImage = (image) => {
+    return (
+      <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        { image &&
+          <>
+            <Image source={{ uri: image }} style={{ width: 350, height: 300, borderRadius: 15 }} />
+            <TouchableOpacity style={{ marginLeft: 300, marginTop: -35}} onPress={pickImage}>
+              <Text style={{ fontWeight: 'bold', color: '#ACECC2' }}>Edit</Text>
+            </TouchableOpacity>
+          </>
+        }
+      </View>
+    )
+  }
+
+  // NOW RENDER ALL THIS
   return (
     <View style={styles.container}>
       <View style={styles.backButtonWrapper}>
         <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back-outline" size='25' color={'#ACECC2'} />
+          <Ionicons name={'arrow-back-outline'} size='25' color={'#ACECC2'} />
         </TouchableOpacity>
       </View>
       <View style={styles.titleWrapper}>
         <Text style={styles.pageTitle}>{updateField2}</Text>
       </View>
-      <View style={styles.textSectionWrapper}>
-        <TouchableOpacity style={{ position: 'absolute', left: 50, top: 165, zIndex: 5}} onPress={() => handleRemoveText()}>
-          <Text style={{ color: '#ACECC2', fontWeight: 'bold'}}>Clear</Text>
-        </TouchableOpacity>
-        <View style={styles.textBoxWrapper}>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <TextInput
-              style={styles.textBox}
-              multiline={true}
-              placeholder="start typing"
-              value={update}
-              onChangeText={text => setUpdate(text)}
-              autoCapitalize="sentences"
-            />
-          </TouchableWithoutFeedback>
-          <Text style={ characterCount < 25 ? styles.characterCount2 : styles.characterCount}>{characterCount}</Text>
-          <TouchableOpacity onPress={Keyboard.dismiss}>
-            <Text style={styles.saveText}>Save</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.imageSectionWrapper}>
-        <TouchableOpacity onPress={!image ? pickImage : clearImage} style={styles.addPictureButton}>
-          <Text style={{ marginLeft: '7.5%', fontWeight: 'bold', color: '#ACECC2' }}>{ !image ? 'Add Picture' : null }</Text>
-        </TouchableOpacity>
-        <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-          { image && <Image source={{ uri: image }} style={{ width: '90%', height: '100%', borderRadius: 15}} /> }
+      <View>
+        {
+          modalVisible ? modalComponent() : null
+        }
+        <View>
+          <View style={{ marginTop: 15}}>
+            {
+              !image ? baseComponentWithoutImage() : baseComponentWithImage(image)
+            }
+          </View>
+          <View>
+            {
+              !update ? baseComponentWithoutUpdate() : baseComponentWithUpdate()
+            }
+          </View>
         </View>
       </View>
       <View style={styles.nextButtonWrapper}>
-        {
-          image ? <TouchableOpacity style={{ marginLeft: 25, marginBottom: -25 }} onPress={clearImage}>
-            <Ionicons name="trash-outline" size='25' color={'#ACECC2'} />
-          </TouchableOpacity> : null
-        }
-        {
-          !image && !update ? null :
-            <TouchableOpacity style={styles.nextButton} onPress={handleNext} >
-              <Text style={styles.nextText}>Next</Text>
-              <Ionicons name="arrow-forward-outline" size='25' color={'#ACECC2'} />
-            </TouchableOpacity>
-        }
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext} >
+          <Text style={styles.nextText}>Next</Text>
+          <Ionicons name="arrow-forward-outline" size='25' color={'#ACECC2'} />
+        </TouchableOpacity>
       </View>
     </View>
   )
@@ -174,12 +268,14 @@ const UpdateField2 = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    display: 'flex',
     backgroundColor: 'snow',
     opacity: 0.9,
   },
   backButtonWrapper: {
-    marginTop: 75,
+    marginTop: 70,
     marginLeft: 25,
+    zIndex: 5,
   },
   titleWrapper: {
     display: 'flex',
@@ -218,10 +314,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textBox: {
-    padding: 35,
+    padding: 15,
+    paddingTop: 15,
     paddingRight: 50,
-    marginTop: -20,
-    paddingTop: 10,
     height: 175,
     width: 350,
     borderRadius: 15,
@@ -230,16 +325,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   characterCount: {
-    marginTop: -160,
     fontWeight: 'bold',
     opacity: 0.5,
     color: '#ACECC2',
-    marginRight: -275,
     paddingLeft: 25,
   },
   characterCount2: {
-    marginTop: -160,
-    marginRight: -275,
     fontWeight: 'bold',
     opacity: 0.5,
     color: 'red',
@@ -247,11 +338,6 @@ const styles = StyleSheet.create({
   },
   buttonsWrapper: {
     flexDirection: 'row',
-  },
-  clearButton: {
-    position: 'absolute',
-    top: '100%',
-    left: '100%',
   },
   nextButtonWrapper: {
     position: 'absolute',
@@ -276,11 +362,11 @@ const styles = StyleSheet.create({
     marginTop: 2.5,
     color: '#ACECC2',
   },
-  saveText: {
-    marginLeft: 275,
-    marginTop: 115,
-    color: '#ACECC2',
-    fontWeight: 'bold',
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
   },
 })
 

@@ -42,6 +42,10 @@ const OPTIONS = [
     id: 'REL',
   },
   {
+    label: 'Media',
+    id: 'MED',
+  },
+  {
     label: 'Other',
     id: 'OTH',
   },
