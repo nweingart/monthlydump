@@ -15,14 +15,12 @@ import {useNavigation} from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import {setUpdate3, setUpdate3Image} from "../../redux/redux";
-import { storage, auth } from '../../Firebase'
-import { ref, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage'
-import {manipulateAsync, SaveFormat} from "expo-image-manipulator";
+import {  auth } from '../../Firebase'
 
 const UpdateField3 = () => {
   const [update, setUpdate] = React.useState('')
   const [modalVisible, setModalVisible] = React.useState(false)
-  const [image, setImage] = React.useState('');
+  const [localImage, setLocalImage] = React.useState('')
   const [uploading, setUploading] = React.useState(false);
 
   const userEmail = auth.currentUser.email
@@ -39,10 +37,6 @@ const UpdateField3 = () => {
   const handleModalClose = () => {
     setModalVisible(false)
   }
-
-  React.useEffect(() => {
-    console.log(image)
-  }, [image])
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -66,8 +60,7 @@ const UpdateField3 = () => {
       setUploading(true)
 
       if (!pickerResult.cancelled) {
-        const uploadUrl = await uploadImageAsync(pickerResult.uri)
-        setImage(uploadUrl)
+        setLocalImage(pickerResult.uri)
       }
     } catch (e) {
       console.log(e)
@@ -78,37 +71,13 @@ const UpdateField3 = () => {
   }
 
 // the upload function!
-  const uploadImageAsync = async (uri) => {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function() {
-        resolve(xhr.response);
-      }
-      xhr.onerror = function(e) {
-        console.log(e);
-        reject(new TypeError('Network request failed'));
-      }
-      xhr.responseType = 'blob';
-      xhr.open('GET', uri, true);
-      xhr.send(null);
-    })
-
-    const storageRef = ref(storage, `${userEmail}/${currentPeriod}/update3.png`);
-    const result = await uploadBytes(storageRef, blob)
-    console.log(result)
-
-    blob.close()
-
-    return await getDownloadURL(storageRef)
-  }
-
 
 
   // the handle function calls the upload function
 
   // the upload function!
 
-  const disabled = !update && !image
+  const disabled = !update && !localImage
   const dispatch = useDispatch()
   const updateField3 = useSelector(state => state.updateField3)
 
@@ -128,7 +97,7 @@ const UpdateField3 = () => {
       return Alert.alert('Whoops!', 'Please add an update or image to continue', [{text: 'OK'}])
     } else {
       dispatch(setUpdate3(update))
-      dispatch(setUpdate3Image(image))
+      dispatch(setUpdate3Image(localImage))
       navigation.navigate('UpdateField4')
     }
   }
@@ -249,7 +218,7 @@ const UpdateField3 = () => {
         <View>
           <View style={{ marginTop: 15}}>
             {
-              !image ? baseComponentWithoutImage() : baseComponentWithImage(image)
+              !localImage ? baseComponentWithoutImage() : baseComponentWithImage(localImage)
             }
           </View>
           <View>

@@ -15,14 +15,12 @@ import {useNavigation} from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import {setUpdate4, setUpdate4Image} from "../../redux/redux";
-import { storage, auth } from '../../Firebase'
-import { ref, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage'
-import {manipulateAsync, SaveFormat} from "expo-image-manipulator";
+import { auth } from '../../Firebase'
 
 const UpdateField4 = () => {
   const [update, setUpdate] = React.useState('')
   const [modalVisible, setModalVisible] = React.useState(false)
-  const [image, setImage] = React.useState('');
+  const [localImage, setLocalImage] = React.useState('')
   const [uploading, setUploading] = React.useState(false);
 
   const userEmail = auth.currentUser.email
@@ -52,8 +50,7 @@ const UpdateField4 = () => {
       setUploading(true)
 
       if (!pickerResult.cancelled) {
-        const uploadUrl = await uploadImageAsync(pickerResult.uri)
-        setImage(uploadUrl)
+        setLocalImage(pickerResult.uri)
       }
     } catch (e) {
       console.log(e)
@@ -64,29 +61,6 @@ const UpdateField4 = () => {
   }
 
 // the upload function!
-  const uploadImageAsync = async (uri) => {
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = function() {
-        resolve(xhr.response);
-      }
-      xhr.onerror = function(e) {
-        console.log(e);
-        reject(new TypeError('Network request failed'));
-      }
-      xhr.responseType = 'blob';
-      xhr.open('GET', uri, true);
-      xhr.send(null);
-    })
-
-    const storageRef = ref(storage, `${userEmail}/${currentPeriod}/update4.png`);
-    const result = await uploadBytes(storageRef, blob)
-    console.log(result)
-
-    blob.close()
-
-    return await getDownloadURL(storageRef)
-  }
 
 
   // base function for picking the image
@@ -100,15 +74,11 @@ const UpdateField4 = () => {
     setModalVisible(false)
   }
 
-  React.useEffect(() => {
-    console.log(image)
-  }, [image])
-
   // the handle function calls the upload function
 
   // the upload function!
 
-  const disabled = !update && !image
+  const disabled = !update && !localImage
   const dispatch = useDispatch()
   const updateField4 = useSelector(state => state.updateField4)
 
@@ -128,7 +98,7 @@ const UpdateField4 = () => {
       return Alert.alert('Whoops!', 'Please add an update or image to continue', [{text: 'OK'}])
     } else {
       dispatch(setUpdate4(update))
-      dispatch(setUpdate4Image(image))
+      dispatch(setUpdate4Image(localImage))
       navigation.navigate('Preview')
     }
   }
@@ -249,7 +219,7 @@ const UpdateField4 = () => {
         <View>
           <View style={{ marginTop: 15}}>
             {
-              !image ? baseComponentWithoutImage() : baseComponentWithImage(image)
+              !localImage ? baseComponentWithoutImage() : baseComponentWithImage(localImage)
             }
           </View>
           <View>

@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, SafeAreaView } from 'react-native'
+import React, {useState} from 'react'
+import {FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
-import { useSelector, useDispatch } from "react-redux";
-import { setUpdateSubmitted } from "../redux/redux";
-import {auth, db, usersRef} from '../Firebase'
-import { httpsCallable, getFunctions } from 'firebase/functions'
+import {useNavigation} from "@react-navigation/native";
+import {useDispatch, useSelector} from "react-redux";
+import {setUpdateSubmitted} from "../redux/redux";
+import {auth, db} from '../Firebase'
+import {getFunctions, httpsCallable} from 'firebase/functions'
 import {doc, getDoc} from "firebase/firestore";
+import firebase from 'firebase/app';
+import 'firebase/storage';
 
 const Preview = () => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -34,9 +36,10 @@ const Preview = () => {
 
   const email = currentUser.email
 
+
+
   const userRef = doc(db, "users", userEmail);
   const mailingListRef = doc(db, "mailingLists", userEmail);
-  console.log(userRef)
 
   const handleBack = () => {
     navigation.navigate('UpdateField4')
@@ -72,7 +75,26 @@ const Preview = () => {
   }, [])
 
 
-  console.log(mailingList)
+  const uploadImageToFirebase = async (uri) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      const storageRef = firebase.storage().ref();
+      const imageRef = storageRef.child(`images/${currentPeriod}/${currentUser.uid}/`);
+      await imageRef.put(blob);
+      const downloadURL = await imageRef.getDownloadURL();
+
+      return downloadURL;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
+  uploadImageToFirebase(image1).then((url) => {console.log(url)})
+
+
 
 
   const handleConfirm = () => {
@@ -110,7 +132,7 @@ const Preview = () => {
 
   const renderImage = ({ item }) => {
       return (
-        <View style={{ width: '95%' }} key={item.id}>
+        <View style={{ width: 325 }} key={item.id}>
           <Text style={styles.topicText}>{item.topic}</Text>
           <Image source={{ uri: item.uri }} style={styles.image} />
           <Text style={styles.text}>{item.text}</Text>
