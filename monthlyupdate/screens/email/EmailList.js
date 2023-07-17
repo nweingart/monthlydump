@@ -1,9 +1,12 @@
 import React from 'react'
 import {View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, FlatList, Alert} from 'react-native'
-import Ionicons from "@expo/vector-icons/Ionicons"
-import { useNavigation } from "@react-navigation/native"
-import { db, auth } from '../Firebase'
-import {doc, getDoc, setDoc} from "firebase/firestore";
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { useNavigation } from '@react-navigation/native'
+import { db, auth } from '../../Firebase'
+import { doc, getDoc, setDoc } from 'firebase/firestore'
+import * as Clipboard from 'expo-clipboard';
+
+
 
 const EmailList = () => {
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -14,6 +17,14 @@ const EmailList = () => {
   console.log(userEmail)
 
   const mailingListRef = doc(db, "mailingLists", userEmail);
+
+  const copyToClipboard = () => {
+    const emailString = mailingList.join(", ");
+    Clipboard.setString(emailString);
+    Alert.alert('Great Success!', 'Email list copied to clipboard')
+  };
+
+
 
   const handleAdd = () => {
     if (checkEmail(email)) {
@@ -89,13 +100,13 @@ const EmailList = () => {
         </TouchableOpacity>
       </View>
     </View>
-)
+  )
 
   const renderItem = ({ item }) => {
     return (
       <Item
         item={item}
-        />
+      />
     )
   }
 
@@ -106,9 +117,9 @@ const EmailList = () => {
           <Ionicons name="arrow-back-outline" size='25' />
         </TouchableOpacity>
       </View>
-      <View style={styles.addEmailButton}>
+      <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Ionicons name="add-circle-outline" color="#ACECC2" size='25'/>
+          <Ionicons name="add-circle-outline" color="#ACECC2" size='35'/>
         </TouchableOpacity>
       </View>
       <View style={styles.emailListWrapper}>
@@ -141,13 +152,19 @@ const EmailList = () => {
                 value={email}
               />
             </View>
-            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <TouchableOpacity style={styles.modalButton} onPress={handleAdd}>
                 <Text style={{ fontWeight: 'bold' }}>Add</Text>
               </TouchableOpacity>
             </View>
           </Modal>
         </View>
+      </View>
+      <View>
+        <TouchableOpacity style={{ marginLeft: 175, flexDirection: 'row', marginTop: -100 }} onPress={copyToClipboard}>
+          <Text style={{ marginTop: 10, marginRight: 5, fontWeight: 'bold', color: '#ACECC2' }}>Copy Email List</Text>
+          <Ionicons name="copy-outline" color="#ACECC2" size='35' />
+        </TouchableOpacity>
       </View>
     </View>
   )
@@ -182,15 +199,20 @@ const styles = StyleSheet.create({
     top: '7.5%',
     left: '7.5%',
   },
+  buttonContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginTop: 125,
+  },
   addEmailButton: {
     position: 'absolute',
-    top: '25%',
+    top: '10%',
     left: '55%',
   },
   emailListWrapper: {
-    paddingVertical: 20,
+    paddingTop: 20,
     position: 'absolute',
-    top: '35%',
+    top: '25%',
     backgroundColor: 'white',
     height: '60%',
     width: '90%',

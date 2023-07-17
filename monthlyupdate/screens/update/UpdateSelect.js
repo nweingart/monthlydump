@@ -82,7 +82,7 @@ const UpdateSelect = () => {
     dispatch(setUpdateField2(selectedItem2.label))
     dispatch(setUpdateField3(selectedItem3.label))
     dispatch(setUpdateField4(selectedItem4.label))
-    navigation.navigate('UpdateField1')
+    navigation.navigate('Update1')
   }
 
   const handleClick = (item) => {

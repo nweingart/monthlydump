@@ -6,18 +6,19 @@ import { store } from './redux/redux'
 
 
 // screens
-import Home from './screens/Home'
-import EmailList from "./screens/EmailList"
+import Home from './screens/other/Home'
+import EmailList from "./screens/email/EmailList"
 import UpdateSelect from "./screens/update/UpdateSelect"
-import Login from './screens/Login'
-import Register from './screens/Register'
-import UpdateField1 from "./screens/update/UpdateField1"
-import UpdateField2 from "./screens/update/UpdateField2"
-import UpdateField3 from "./screens/update/UpdateField3"
-import UpdateField4 from "./screens/update/UpdateField4"
+import Login from './screens/authentication/Login'
+import Register from './screens/authentication/Register'
+import Update1 from "./screens/update/Update1"
+import Update2 from "./screens/update/Update2"
+import Update3 from "./screens/update/Update3"
+import Update4 from "./screens/update/Update4"
 import Goals from "./screens/update/Goals"
-import Preview from "./screens/Preview"
-import Confirmation from "./screens/Confirmation"
+import GoalsTracker from "./screens/other/GoalsTracker"
+import Preview from "./screens/other/Preview"
+import Confirmation from "./screens/other/Confirmation"
 
 const Stack = createNativeStackNavigator()
 
@@ -31,11 +32,12 @@ const App = () => {
           <Stack.Screen options={{ headerShown: false }} name="Home" component={Home} />
           <Stack.Screen options={{ headerShown: false }} name="EmailList" component={EmailList} />
           <Stack.Screen options={{ headerShown: false }} name="UpdateSelect" component={UpdateSelect} />
-          <Stack.Screen options={{ headerShown: false }} name="UpdateField1" component={UpdateField1} />
-          <Stack.Screen options={{ headerShown: false }} name="UpdateField2" component={UpdateField2} />
-          <Stack.Screen options={{ headerShown: false }} name="UpdateField3" component={UpdateField3} />
-          <Stack.Screen options={{ headerShown: false }} name="UpdateField4" component={UpdateField4} />
+          <Stack.Screen options={{ headerShown: false }} name="Update1" component={Update1} />
+          <Stack.Screen options={{ headerShown: false }} name="Update2" component={Update2} />
+          <Stack.Screen options={{ headerShown: false }} name="Update3" component={Update3} />
+          <Stack.Screen options={{ headerShown: false }} name="Update4" component={Update4} />
           <Stack.Screen options={{ headerShown: false }} name="Goals" component={Goals} />
+          <Stack.Screen options={{ headerShown: false }} name="GoalsTracker" component={GoalsTracker} />
           <Stack.Screen options={{ headerShown: false }} name="Preview" component={Preview} />
           <Stack.Screen options={{ headerShown: false }} name="Confirmation" component={Confirmation} />
         </Stack.Navigator>

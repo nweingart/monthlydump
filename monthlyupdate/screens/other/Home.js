@@ -1,12 +1,13 @@
 import React from 'react'
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native'
-import {useNavigation} from "@react-navigation/native"
-import {auth} from "../Firebase"
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native'
+import { useNavigation } from "@react-navigation/native"
+import {auth} from "../../Firebase"
+import { useSelector }  from "react-redux"
 
 
 const Home = () => {
+  const updateSubmitted = useSelector(state => state.updateSubmitted)
   const navigation = useNavigation()
-  const submitted = false
   const user = auth.currentUser
 
   const handleSignOut = () => {
@@ -25,8 +26,16 @@ const Home = () => {
     navigation.navigate("EmailList")
   }
 
+  const handleGoalsClick = () => {
+    navigation.navigate("GoalsTracker")
+  }
+
   const handleUpdateClick = () => {
-    submitted === true ? navigation.navigate("Preview") : navigation.navigate("UpdateSelect")
+    updateSubmitted === true ? navigation.navigate("Preview") : navigation.navigate("UpdateSelect")
+  }
+
+  const handleNewDumpClick = () => {
+    navigation.navigate("UpdateSelect")
   }
 
   return (
@@ -40,19 +49,34 @@ const Home = () => {
         <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#ACECC2', marginTop: -150 }}>Monthly Dump</Text>
       </View>
       <View>
-        <Image source={require('../assets/logo.png')} style={{ height: 100, width: 100, marginTop: -75, marginBottom: 150 }}/>
+        <Image source={require('../../assets/logo.png')} style={{ height: 100, width: 100, marginTop: -75, marginBottom: 150 }}/>
       </View>
       <View style={styles.linkWrapper}>
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleUpdateClick}>
           <Text style={styles.linkButtonText}>
-            {submitted ? "View Last Dump" : "Create Dump"}
+            {updateSubmitted ? "View Last Dump" : "Create Dump"}
           </Text>
         </TouchableOpacity>
+        {
+          updateSubmitted &&
+          <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleNewDumpClick}>
+            <Text style={styles.linkButtonText}>
+            Start New Dump
+            </Text>
+          </TouchableOpacity>
+        }
         <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleEmailListClick}>
           <Text style={styles.linkButtonText}>
             Edit Mailing List
           </Text>
         </TouchableOpacity>
+        {
+          updateSubmitted && <TouchableOpacity style={styles.linkButtonWrapper} onPress={handleGoalsClick}>
+          <Text style={styles.linkButtonText}>
+          This Month's Goals
+          </Text>
+          </TouchableOpacity>
+        }
       </View>
     </View>
   )

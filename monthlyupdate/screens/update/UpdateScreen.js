@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import {
   View,
   Text,
@@ -6,104 +6,124 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
-  Keyboard,
   Modal,
   Alert
-} from 'react-native'
-import Ionicons from "@expo/vector-icons/Ionicons";
-import {useNavigation} from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
+} from 'react-native';
+import Ionicons from "@expo/vector-icons/Ionicons"
+import { useNavigation } from "@react-navigation/native"
+import { useDispatch, useSelector } from "react-redux"
+
+import Dropdown from "../../common/Dropdown";
 import * as ImagePicker from "expo-image-picker";
-import {setUpdate3, setUpdate3Image} from "../../redux/redux";
-import {  auth } from '../../Firebase'
 
-const UpdateField3 = () => {
-  const [update, setUpdate] = React.useState('')
-  const [modalVisible, setModalVisible] = React.useState(false)
-  const [localImage, setLocalImage] = React.useState('')
-  const [uploading, setUploading] = React.useState(false);
+import { storage, auth, db } from '../../Firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import {doc, setDoc} from "firebase/firestore";
 
-  const userEmail = auth.currentUser.email
-  const currentPeriod = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).split(" ").join("")
+const UpdateScreen = ({ number, fieldTitle, setUpdateAction, setUpdateImageAction, navigateFrom, navigateTo}) => {
+  const email = auth.currentUser.email;
+  const [update, setUpdate] = React.useState('');
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [image, setImage] = React.useState('');
+  const [imageUrl, setImageUrl] = React.useState('');
+  const option1 = useSelector((state) => state.updateField1);
+  const option2 = useSelector((state) => state.updateField2);
+  const option3 = useSelector((state) => state.updateField3);
+  const option4 = useSelector((state) => state.updateField4);
 
-
-
-
-  // base function for picking the image
-  const handleModalOpen = () => {
-    setModalVisible(true)
-  }
-
-  const handleModalClose = () => {
-    setModalVisible(false)
-  }
+  const currentPeriod = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).split(" ").join("");
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let pickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.2,
+      quality: 1,
     });
 
-    console.log({ pickerResult })
-
-    // once the image is picked, we call the function to handle the image
-    handlePickedImage(pickerResult)
-
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
   };
 
-// the handle function calls the upload function
-  const handlePickedImage = async (pickerResult) => {
-    try {
-      setUploading(true)
+  const uploadImage = async () => {
+    if (!image) return;
 
-      if (!pickerResult.cancelled) {
-        setLocalImage(pickerResult.uri)
+    const response = await fetch(image);
+    const blob = await response.blob();
+
+    const storageRef = ref(storage, `images/${email}/${currentPeriod}/${number}`);
+    const uploadTask = uploadBytesResumable(storageRef, blob);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      },
+      (error) => {
+        console.log(error);
+      },
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        console.log('File available at:', downloadURL)
+        console.log(downloadURL)
+        setImageUrl(downloadURL)
+        dispatch(setUpdateImageAction(downloadURL))
       }
-    } catch (e) {
-      console.log(e)
-      alert('Upload failed, sorry :(')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-// the upload function!
+    );
+  };
 
 
-  // the handle function calls the upload function
+  const handleModalOpen = () => {
+    setModalVisible(true);
+  };
 
-  // the upload function!
+  const handleModalClose = () => {
+    setModalVisible(false);
+  };
 
-  const disabled = !update && !localImage
-  const dispatch = useDispatch()
-  const updateField3 = useSelector(state => state.updateField3)
+  const disabled = !update && !image;
+  const dispatch = useDispatch();
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const handleBack = () => {
-    console.log('back button pressed')
-    navigation.navigate('UpdateField2')
+    console.log('back button pressed');
+    navigation.navigate(`${navigateFrom}`);
+  };
+
+  const takeDump = async (userId, month, updateNumber, topic, text, imageUrl) => {
+    const docId = `${userId}-${month}`;
+    const docRef = doc(db, 'dumps', docId);
+
+    await setDoc(docRef, {
+      [`update${updateNumber}`]: {
+        topic,
+        text,
+        imageUrl
+      }
+    }, { merge: true });
   }
 
-  const handleRemoveText = () => {
-    setUpdate('')
-  }
+  console.log(image)
+  console.log(setUpdateImageAction)
+
 
   const handleNext = () => {
     if (disabled) {
-      return Alert.alert('Whoops!', 'Please add an update or image to continue', [{text: 'OK'}])
-    } else {
-      dispatch(setUpdate3(update))
-      dispatch(setUpdate3Image(localImage))
-      navigation.navigate('UpdateField4')
+      return Alert.alert('Whoops!', 'Please add an update or image to continue', [{ text: 'OK' }]);
+    } else if (update && image) {
+      takeDump(email, currentPeriod, number, fieldTitle, update, imageUrl);
+      uploadImage();
+      dispatch(setUpdateAction(update));
+      navigation.navigate(`${navigateTo}`);
     }
-  }
+  };
 
-  const characterCount = 280 - update.length
+  const characterCount = 280 - update.length;
 
+  // Render function for the modal component
   const modalComponent = () => {
     return (
       <View style={styles.centeredView}>
@@ -142,6 +162,7 @@ const UpdateField3 = () => {
       </View>
     )
   }
+
   const promptBox = (icon, type) => {
     return (
       <TouchableOpacity onPress={type === 'Update' ? handleModalOpen : pickImage}>
@@ -199,8 +220,6 @@ const UpdateField3 = () => {
       </View>
     )
   }
-
-  // NOW RENDER ALL THIS
   return (
     <View style={styles.container}>
       <View style={styles.backButtonWrapper}>
@@ -209,16 +228,16 @@ const UpdateField3 = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.titleWrapper}>
-        <Text style={styles.pageTitle}>{updateField3}</Text>
+        <Dropdown option1={option1} option2={option2} option3={option3} option4={option4} number={number - 1} />
       </View>
       <View>
         {
           modalVisible ? modalComponent() : null
         }
         <View>
-          <View style={{ marginTop: 15}}>
+          <View style={{ marginTop: 15 }}>
             {
-              !localImage ? baseComponentWithoutImage() : baseComponentWithImage(localImage)
+              !image ? baseComponentWithoutImage() : baseComponentWithImage(image)
             }
           </View>
           <View>
@@ -229,14 +248,14 @@ const UpdateField3 = () => {
         </View>
       </View>
       <View style={styles.nextButtonWrapper}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext} >
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextText}>Next</Text>
           <Ionicons name="arrow-forward-outline" size='25' color={'#ACECC2'} />
         </TouchableOpacity>
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -249,11 +268,13 @@ const styles = StyleSheet.create({
     marginTop: 70,
     marginLeft: 25,
     zIndex: 5,
+    width: 100,
   },
   titleWrapper: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 25,
   },
   pageTitle: {
     fontSize: 30,
@@ -343,4 +364,6 @@ const styles = StyleSheet.create({
   },
 })
 
-export default UpdateField3
+export default UpdateScreen;
+
+

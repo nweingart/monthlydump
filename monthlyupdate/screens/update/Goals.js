@@ -10,24 +10,40 @@ import {
 } from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useNavigation} from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setUpdateGoal1, setUpdateGoal2, setUpdateGoal3 } from '../../redux/redux'
+import { db, auth } from '../../Firebase'
+import { doc, setDoc } from 'firebase/firestore'
 
 const Goals = () => {
   const [goal1, setGoal1] = React.useState('')
   const [goal2, setGoal2] = React.useState('')
   const [goal3, setGoal3] = React.useState('')
 
+  const email = auth.currentUser.email
   const dispatch = useDispatch()
+  const currentPeriod = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).split(" ").join("");
 
 
   const navigation = useNavigation()
 
+  const uploadGoals = async (userId, currentPeriod, goal1, goal2, goal3) => {
+    const docId = `${userId}-${currentPeriod}`;
+    const docRef = doc(db, 'goals', docId);
+
+    await setDoc(docRef, {
+      goal1,
+      goal2,
+      goal3
+    }, { merge: true });
+  }
+
   const handleBack = () => {
-    navigation.navigate('UpdateField4')
+    navigation.navigate('Update4')
   }
 
   const handleNext = () => {
+    uploadGoals(email, currentPeriod, goal1, goal2, goal3)
     navigation.navigate('Preview')
     dispatch(setUpdateGoal1(goal1))
     dispatch(setUpdateGoal2(goal2))
@@ -51,7 +67,7 @@ const Goals = () => {
               <TextInput
                 style={{...styles.textBox, height: 100}}
                 multiline={true}
-                placeholder="start typing"
+                placeholder="Exercise 5 times per week"
                 value={goal1}
                 onChangeText={text => setGoal1(text)}
                 autoCapitalize="sentences"
@@ -71,7 +87,7 @@ const Goals = () => {
               <TextInput
                 style={{...styles.textBox, height: 100}}
                 multiline={true}
-                placeholder="start typing"
+                placeholder="Read for 15 minutes a day"
                 value={goal2}
                 onChangeText={text => setGoal2(text)}
                 autoCapitalize="sentences"
@@ -91,7 +107,7 @@ const Goals = () => {
               <TextInput
                 style={{...styles.textBox, height: 100}}
                 multiline={true}
-                placeholder="start typing"
+                placeholder="Wake up at 7am every week day"
                 value={goal3}
                 onChangeText={text => setGoal3(text)}
                 autoCapitalize="sentences"

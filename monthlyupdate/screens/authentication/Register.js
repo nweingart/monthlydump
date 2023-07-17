@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import {Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
-import { auth, db, usersRef } from '../Firebase'
+import { auth, db, usersRef } from '../../Firebase'
 import {createUserWithEmailAndPassword} from 'firebase/auth'
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { setFirstName } from "../redux/redux";
+import { setFirstName } from "../../redux/redux";
 import { setDoc, doc } from "firebase/firestore";
 
 
@@ -60,7 +60,7 @@ const Register = () => {
         <Text style={{ fontSize: 30, fontWeight: 'bold', color: '#ACECC2', marginBottom: 25 }}>Monthly Dump</Text>
       </View>
       <View>
-        <Image source={require('../assets/logo.png')} style={{ height: 100, width: 100, marginBottom: 50 }}/>
+        <Image source={require('../../assets/logo.png')} style={{ height: 100, width: 100, marginBottom: 50 }}/>
       </View>
       <View style={styles.inputContainer}>
         <TextInput

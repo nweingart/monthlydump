@@ -1,12 +1,12 @@
 import React, {useState} from 'react'
 import {FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {useNavigation} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import {useDispatch, useSelector} from "react-redux";
-import {setUpdateSubmitted} from "../redux/redux";
-import {auth, db} from '../Firebase'
-import {getFunctions, httpsCallable} from 'firebase/functions'
-import {doc, getDoc} from "firebase/firestore";
+import { setUpdateSubmitted } from "../../redux/redux";
+import { auth, db } from '../../Firebase'
+import { getFunctions, httpsCallable } from 'firebase/functions'
+import {doc, getDoc, setDoc} from "firebase/firestore";
 import firebase from 'firebase/app';
 import 'firebase/storage';
 
@@ -15,10 +15,7 @@ const Preview = () => {
   const [name, setName] = useState('')
   const [mailingList, setMailingList] = useState([])
   const userEmail = auth.currentUser.email
-  const today = new Date()
   const currentUser = auth.currentUser
-  const currentPeriod = new Date().toLocaleString('default', { month: 'long', year: 'numeric' }).split(" ").join("")
-  const month = today.toLocaleString('default', { month: 'long' })
   const navigation = useNavigation()
   const dispatch = useDispatch()
   const topic1 = useSelector(state => state.updateField1)
@@ -33,16 +30,34 @@ const Preview = () => {
   const topic4 = useSelector(state => state.updateField4)
   const update4 = useSelector(state => state.update4)
   const image4 = useSelector(state => state.update4Image)
+  const updateGoal1 = useSelector(state => state.updateGoal1)
+  const updateGoal2 = useSelector(state => state.updateGoal2)
+  const updateGoal3 = useSelector(state => state.updateGoal3)
 
   const email = currentUser.email
 
 
+  const getCurrentMonth = () => {
+    const date = new Date();
+    const monthIndex = date.getMonth();
+    const months = [
+      "January", "February", "March", "April", "May", "June", "July",
+      "August", "September", "October", "November", "December"
+    ];
 
+    return months[monthIndex];
+  }
+
+
+  const month = getCurrentMonth()
+  const year = new Date().getFullYear()
+  const currentPeriod =  month + "/" + year
+  console.log(currentPeriod)
   const userRef = doc(db, "users", userEmail);
   const mailingListRef = doc(db, "mailingLists", userEmail);
 
   const handleBack = () => {
-    navigation.navigate('UpdateField4')
+    navigation.goBack()
   }
 
   const functions = getFunctions()
@@ -75,28 +90,6 @@ const Preview = () => {
   }, [])
 
 
-  const uploadImageToFirebase = async (uri) => {
-    try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      const storageRef = firebase.storage().ref();
-      const imageRef = storageRef.child(`images/${currentPeriod}/${currentUser.uid}/`);
-      await imageRef.put(blob);
-      const downloadURL = await imageRef.getDownloadURL();
-
-      return downloadURL;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
-
-  uploadImageToFirebase(image1).then((url) => {console.log(url)})
-
-
-
-
   const handleConfirm = () => {
     dispatch(setUpdateSubmitted(true))
     const sendEmail = httpsCallable(functions, 'sendEmail');
@@ -117,6 +110,9 @@ const Preview = () => {
       update4Topic: topic4,
       update4Text: update4,
       update4Image: image4,
+      updateGoal1: updateGoal1,
+      updateGoal2: updateGoal2,
+      updateGoal3: updateGoal3,
     }).then(result => {
       console.log(result.data)
     })
@@ -137,6 +133,17 @@ const Preview = () => {
           <Image source={{ uri: item.uri }} style={styles.image} />
           <Text style={styles.text}>{item.text}</Text>
         </View>
+      )
+  }
+
+  const goalsFooter = () => {
+    return (
+      <View>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#ACECC2', marginBottom: 10 }}>Goals for April</Text>
+        <Text style={{ marginBottom: 10 }}>- {updateGoal1}</Text>
+        <Text style={{ marginBottom: 10 }}>- {updateGoal2}</Text>
+        <Text style={{ marginBottom: 10 }}>- {updateGoal3}</Text>
+      </View>
       )
   }
 
@@ -162,11 +169,11 @@ const Preview = () => {
         </TouchableOpacity>
       </View>
         <View>
-          <Text style={styles.title}>{name}'s March</Text>
+          <Text style={styles.title}>{name}'s {month}</Text>
         </View>
       { !isEnabled ?
         <SafeAreaView style={styles.contentWrapper}>
-          <FlatList data={data} renderItem={renderImage} />
+          <FlatList data={data} renderItem={renderImage} ListFooterComponent={goalsFooter} />
         </SafeAreaView> :
         <View style={{ display: 'flex', flexDirection: 'column', height: 650, width: 400 }}>
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
@@ -216,7 +223,7 @@ const styles = StyleSheet.create({
     marginBottom: '5%',
   },
   topicText:{
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     fontFamily: 'Avenir',
     marginRight: 10,

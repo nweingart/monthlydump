@@ -45,6 +45,9 @@ exports.sendEmail = functions.https.onCall((data, context) => {
             update4Topic: data.update4Topic,
             update4Text: data.update4Text,
             update4Image: data.update4Image,
+            updateGoal1: data.updateGoal1,
+            updateGoal2: data.updateGoal2,
+            updateGoal3: data.updateGoal3,
           };
           const htmlToSend = template(replacements);
           const options = {
